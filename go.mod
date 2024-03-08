@@ -1,4 +1,4 @@
-module app
+module github.com/luca-patrignani/maps
 
 go 1.20
 
