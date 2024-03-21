@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/veandco/go-sdl2/sdl"
@@ -28,8 +29,10 @@ func main() {
 		W: 100,
 		H: 100,
 	})
-
-	points := []sdl.Point{}
+	var scale int32 = 10
+	renderer.SetScale(float32(scale), float32(scale))
+	points := []geometry.Point{}
+	regions := []geometry.Region{}
 	running := true
 	pressed := false
 	for running {
@@ -43,7 +46,16 @@ func main() {
 			case *sdl.MouseMotionEvent:
 				// fmt.Println("Mouse", t.Which, "moved by", t.XRel, t.YRel, "at", t.X, t.Y)
 				if pressed {
-					points = append(points, sdl.Point{X: t.X, Y: t.Y})
+					newPoint := geometry.Point{X: t.X/scale, Y: t.Y/scale}
+					if len(points) == 0 || !reflect.DeepEqual(newPoint, points[len(points)-1]) {
+						points = append(points, newPoint)
+						fmt.Println(points)
+						region, err := geometry.NewRegion(points)
+						if err == nil {
+							regions = append(regions, region)
+							points = []geometry.Point{}
+						}
+					}
 				}
 			case *sdl.MouseButtonEvent:
 				if t.State == sdl.PRESSED {
@@ -56,8 +68,15 @@ func main() {
 			}
 		}
 		renderer.SetDrawColor(255, 0, 0, 255)
-		for i := 0; i < len(points)-1; i++ {
-			renderer.DrawLine(points[i].X, points[i].Y, points[i+1].X, points[i+1].Y)
+		for _, points := range regions {
+			for i := 0; i < len(points)-1; i++ {
+				renderer.DrawLine(points[i].X, points[i].Y, points[i+1].X, points[i+1].Y)
+			}
+			renderer.DrawLine(points[len(points)-1].X, points[len(points)-1].Y, points[0].X, points[0].Y)
+		}
+		renderer.SetDrawColor(0, 255, 0, 255)
+		for _, point := range points {
+			renderer.DrawPoint(point.X, point.Y)
 		}
 		renderer.Present()
 	}
