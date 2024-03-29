@@ -29,7 +29,7 @@ func main() {
 		W: 100,
 		H: 100,
 	})
-	var scale int32 = 2
+	var scale int32 = 10
 	renderer.SetScale(float32(scale), float32(scale))
 	rb := regions.RegionBuilder{}
 	rs := []regions.Region{}
