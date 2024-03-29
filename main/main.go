@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/luca-patrignani/maps/geometry"
-	regions "github.com/luca-patrignani/maps/regions"
+	"github.com/luca-patrignani/maps/regions"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -31,11 +31,10 @@ func main() {
 	})
 	var scale int32 = 2
 	renderer.SetScale(float32(scale), float32(scale))
-	segments := []geometry.Segment{}
+	rb := regions.RegionBuilder{}
 	rs := []regions.Region{}
 	running := true
 	pressed := false
-	var pendingPoint *geometry.Point = nil
 	for running {
 		renderer.SetDrawColor(0, 0, 0, 255)
 		renderer.Clear()
@@ -47,10 +46,7 @@ func main() {
 			case *sdl.MouseMotionEvent:
 				if pressed {
 					newPoint := geometry.Point{X: t.X / scale, Y: t.Y / scale}
-					if pendingPoint != nil && newPoint != *pendingPoint {
-						segments = append(segments, geometry.Segment{P1: *pendingPoint, P2: newPoint})
-					}
-					pendingPoint = &newPoint
+					rb.AddPoint(newPoint)
 				}
 			case *sdl.MouseButtonEvent:
 				if t.State == sdl.PRESSED {
@@ -58,12 +54,11 @@ func main() {
 					fmt.Println("Mouse", t.Which, "button", t.Button, "pressed at", t.X, t.Y)
 				} else {
 					pressed = false
-					pendingPoint = nil
 					fmt.Println("Mouse", t.Which, "button", t.Button, "released at", t.X, t.Y)
-					if region, err := regions.NewRegionFromSegments(segments); err == nil {
+					if region, err := rb.Build(); err == nil {
 						rs = append(rs, region)
 					}
-					segments = []geometry.Segment{}
+					rb = regions.RegionBuilder{}
 				}
 			}
 		}
@@ -75,7 +70,7 @@ func main() {
 			renderer.DrawLine(points[len(points)-1].X, points[len(points)-1].Y, points[0].X, points[0].Y)
 		}
 		renderer.SetDrawColor(0, 255, 0, 255)
-		for _, segment := range segments {
+		for _, segment := range rb.Segments {
 			renderer.DrawLine(segment.P1.X, segment.P1.Y, segment.P2.X, segment.P2.Y)
 		}
 		renderer.Present()
