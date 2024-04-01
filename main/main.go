@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/luca-patrignani/maps"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/regions"
+	"github.com/spf13/afero"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -32,7 +34,12 @@ func main() {
 	var scale int32 = 10
 	renderer.SetScale(float32(scale), float32(scale))
 	rb := regions.RegionBuilder{}
-	rs := []regions.Region{}
+	rr := maps.RegionRepository{Fs: afero.OsFs{}, Filename: "test.json"}
+	rs, err := rr.Load()
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("Creating new region file")
+	}
 	running := true
 	pressed := false
 	for running {
@@ -60,7 +67,18 @@ func main() {
 					}
 					rb = regions.RegionBuilder{}
 				}
+			case *sdl.KeyboardEvent:
+				switch t.Keysym.Sym {
+				case sdl.K_s:
+					if t.State == sdl.PRESSED {
+						err := rr.Save(rs)
+						if err != nil {
+							fmt.Println(err)
+						}
+					}
+				}
 			}
+
 		}
 		renderer.SetDrawColor(255, 0, 0, 255)
 		for _, points := range rs {
