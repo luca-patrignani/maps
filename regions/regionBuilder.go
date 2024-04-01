@@ -5,7 +5,7 @@ import (
 )
 
 type RegionBuilder struct {
-	Segments []geometry.Segment
+	Segments     []geometry.Segment
 	pendingPoint *geometry.Point
 }
 

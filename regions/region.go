@@ -97,7 +97,7 @@ func findCycle(edges map[geometry.Segment]struct{}) ([]geometry.Point, error) {
 							return append(predsU[:i+1], reverse(predsV[:j])...), nil
 						}
 					}
-				}	
+				}
 			}
 		}
 	}
@@ -111,7 +111,7 @@ func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
 		edges[segment] = struct{}{}
 	}
 	for i := 0; i < len(segments); i++ {
-		for j := i+1; j < len(segments); j++ {
+		for j := i + 1; j < len(segments); j++ {
 			if inter, err := geometry.Intersection(segments[i], segments[j]); err == nil {
 				if segments[i].P1 != inter && segments[i].P2 != inter {
 					delete(edges, segments[i])
@@ -121,7 +121,7 @@ func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
 				if segments[j].P1 != inter && segments[j].P2 != inter {
 					delete(edges, segments[j])
 					edges[geometry.Segment{P1: segments[j].P1, P2: inter}] = struct{}{}
-					edges[geometry.Segment{P1: segments[j].P2, P2: inter}] = struct{}{}	
+					edges[geometry.Segment{P1: segments[j].P2, P2: inter}] = struct{}{}
 				}
 				if region, err := findCycle(edges); err == nil {
 					return region, nil

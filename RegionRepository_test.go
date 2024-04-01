@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-
 func TestRegionRepositoryMultipleSaves(t *testing.T) {
 	expected := []regions.Region{
 		{

@@ -66,9 +66,9 @@ func TestNewRegionFromSegmentsLongEdges(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected := Region{
-		geometry.Point{X: 0, Y: 0}, 
-		geometry.Point{X: 10, Y: 0}, 
-		geometry.Point{X: 10, Y: 10}, 
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
 		geometry.Point{X: 0, Y: 10},
 	}
 	if !actual.Equals(expected) {

@@ -47,12 +47,11 @@ func TestIntersectionEnd(t *testing.T) {
 	}
 }
 
-
 func TestIntersection(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{1, 0}}
 	segment2 := Segment{Point{1, 1}, Point{0, 1}}
 	if _, err := Intersection(segment1, segment2); err == nil {
 		t.Fail()
 	}
-	
+
 }
