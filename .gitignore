@@ -20,3 +20,7 @@ app
 
 # Go workspace file
 go.work
+
+maps/
+
+main/main

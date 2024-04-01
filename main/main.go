@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
+	"os"
 
 	"github.com/luca-patrignani/maps"
 	"github.com/luca-patrignani/maps/geometry"
@@ -34,7 +36,10 @@ func main() {
 	var scale int32 = 10
 	renderer.SetScale(float32(scale), float32(scale))
 	rb := regions.RegionBuilder{}
-	rr := maps.RegionRepository{Fs: afero.OsFs{}, Filename: "test.json"}
+	if err := os.MkdirAll("./maps", fs.ModePerm); err != nil {
+		panic(err)
+	}
+	rr := maps.RegionRepository{Fs: afero.NewBasePathFs(afero.OsFs{}, "./maps"), Filename: "test.json"}
 	rs, err := rr.Load()
 	if err != nil {
 		fmt.Println(err)
