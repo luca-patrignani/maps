@@ -8,7 +8,7 @@ import (
 )
 
 type RegionRepository struct {
-	Fs afero.Fs
+	Fs       afero.Fs
 	Filename string
 }
 
