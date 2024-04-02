@@ -28,7 +28,7 @@ jobs:
       run: go test -v ./...
 
     - name: Format
-      run: gofmt -e .
+      run: gofmt -e . > /dev/null
 
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v4.0.0
