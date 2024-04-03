@@ -1,5 +1,3 @@
-//go:build exclude
-
 package main
 
 import (
@@ -7,10 +5,11 @@ import (
 	"io/fs"
 	"os"
 
-	"github.com/luca-patrignani/maps"
 	"github.com/luca-patrignani/maps/geometry"
+	"github.com/luca-patrignani/maps/island"
 	"github.com/luca-patrignani/maps/regions"
 	"github.com/spf13/afero"
+	"github.com/veandco/go-sdl2/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -41,12 +40,17 @@ func main() {
 	if err := os.MkdirAll("./maps", fs.ModePerm); err != nil {
 		panic(err)
 	}
-	rr := maps.RegionRepository{Fs: afero.NewBasePathFs(afero.OsFs{}, "./maps"), Filename: "test.json"}
-	rs, err := rr.Load()
+	var ir island.IslandRepository
+	ir, err = island.NewIslandRepository(afero.NewBasePathFs(afero.OsFs{}, "./maps"), "test.json")
 	if err != nil {
 		fmt.Println(err)
-		fmt.Println("Creating new region file")
+		fmt.Println("creating a new repository from scratch")
+		ir, err = island.InitIslandRepository(afero.NewBasePathFs(afero.OsFs{}, "./maps"), "test.json")
+		if  err != nil {
+			panic(err)
+		}
 	}
+	
 	running := true
 	pressed := false
 	for running {
@@ -70,29 +74,15 @@ func main() {
 					pressed = false
 					fmt.Println("Mouse", t.Which, "button", t.Button, "released at", t.X, t.Y)
 					if region, err := rb.Build(); err == nil {
-						rs = append(rs, region)
+						ir.Save(island.Island{Name: "1", Region: region})
 					}
 					rb = regions.RegionBuilder{}
-				}
-			case *sdl.KeyboardEvent:
-				switch t.Keysym.Sym {
-				case sdl.K_s:
-					if t.State == sdl.PRESSED {
-						err := rr.Save(rs)
-						if err != nil {
-							fmt.Println(err)
-						}
-					}
 				}
 			}
 
 		}
-		renderer.SetDrawColor(255, 0, 0, 255)
-		for _, points := range rs {
-			for i := 0; i < len(points)-1; i++ {
-				renderer.DrawLine(points[i].X, points[i].Y, points[i+1].X, points[i+1].Y)
-			}
-			renderer.DrawLine(points[len(points)-1].X, points[len(points)-1].Y, points[0].X, points[0].Y)
+		for _, island := range ir.Islands() {
+			drawIsland(renderer, island, sdl.Color{R: 255, G: 0, B: 0, A: 255})
 		}
 		renderer.SetDrawColor(0, 255, 0, 255)
 		for _, segment := range rb.Segments {
@@ -100,4 +90,19 @@ func main() {
 		}
 		renderer.Present()
 	}
+}
+
+func drawIsland(renderer *sdl.Renderer, island island.Island, color sdl.Color) {
+	vx := []int16{}
+	vy := []int16{}
+	for _, point := range island.Region {
+		vx = append(vx, int16(point.X))
+		vy = append(vy, int16(point.Y))
+	}
+	gfx.FilledPolygonColor(
+		renderer,
+		vx,
+		vy,
+		color,
+	)
 }
