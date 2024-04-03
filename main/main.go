@@ -1,3 +1,5 @@
+//go:build exclude
+
 package main
 
 import (
@@ -46,11 +48,11 @@ func main() {
 		fmt.Println(err)
 		fmt.Println("creating a new repository from scratch")
 		ir, err = island.InitIslandRepository(afero.NewBasePathFs(afero.OsFs{}, "./maps"), "test.json")
-		if  err != nil {
+		if err != nil {
 			panic(err)
 		}
 	}
-	
+
 	running := true
 	pressed := false
 	for running {

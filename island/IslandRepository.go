@@ -9,16 +9,15 @@ import (
 )
 
 type islandsJson struct {
-	Islands map[uint]Island
+	Islands  map[uint]Island
 	Sequence uint
 }
 
 type IslandRepository struct {
 	Fs       afero.Fs
 	Filename string
-	data islandsJson
+	data     islandsJson
 }
-
 
 func (ir *IslandRepository) Save(island Island) (id uint, err error) {
 	ir.data.Islands[ir.data.Sequence] = island

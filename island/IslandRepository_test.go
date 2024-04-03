@@ -11,7 +11,7 @@ import (
 func TestIslandRepositoryMultipleSaves(t *testing.T) {
 	expected := map[uint]Island{
 		0: {
-			Name:   "First Island",
+			Name: "First Island",
 			Region: regions.Region{
 				geometry.Point{X: 0, Y: 0},
 				geometry.Point{X: 10, Y: 0},
@@ -20,7 +20,7 @@ func TestIslandRepositoryMultipleSaves(t *testing.T) {
 			},
 		},
 		1: {
-			Name:   "Second Island",
+			Name: "Second Island",
 			Region: regions.Region{
 				geometry.Point{X: 10, Y: 0},
 				geometry.Point{X: 20, Y: 0},
@@ -29,7 +29,7 @@ func TestIslandRepositoryMultipleSaves(t *testing.T) {
 			},
 		},
 	}
-	
+
 	fs := afero.NewMemMapFs()
 	ir, err := InitIslandRepository(fs, "test.json")
 	if err != nil {
@@ -59,7 +59,7 @@ func TestIslandRepositoryMultipleSaves(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected[2] = Island{
-		Name:   "Third Island",
+		Name: "Third Island",
 		Region: regions.Region{
 			geometry.Point{X: 100, Y: 100},
 			geometry.Point{X: 100, Y: 200},
@@ -82,4 +82,3 @@ func TestIslandRepositoryMultipleSaves(t *testing.T) {
 		}
 	}
 }
-
