@@ -75,3 +75,27 @@ func TestNewRegionFromSegmentsLongEdges(t *testing.T) {
 		t.Fatal(expected, actual)
 	}
 }
+
+func TestSides(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}	
+	expected := []geometry.Segment{
+		{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
+		{P1: geometry.Point{X: 10, Y: 0}, P2: geometry.Point{X: 10, Y: 10}},
+		{P1: geometry.Point{X: 10, Y: 10}, P2: geometry.Point{X: 0, Y: 10}},
+		{P1: geometry.Point{X: 0, Y: 10}, P2: geometry.Point{X: 0, Y: 0}},
+	}
+	actual := r.Sides()
+	if len(actual) != len(expected) {
+		t.Fatal()
+	}
+	for i := range actual {
+		if actual[i] != expected[i] {
+			t.Fatal(actual[i], "!=", expected[i])
+		}
+	}
+}

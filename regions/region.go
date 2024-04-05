@@ -8,6 +8,15 @@ import (
 
 type Region []geometry.Point
 
+func (r Region) Sides() []geometry.Segment {
+	sides := []geometry.Segment{}
+	for i := 0; i < len(r)-1; i++ {
+		sides = append(sides, geometry.Segment{P1: r[i], P2: r[i+1]})
+	}
+	sides = append(sides, geometry.Segment{P1: r[len(r)-1], P2: r[0]})
+	return sides
+}
+
 func (a Region) notReverseEquals(b Region) bool {
 	if len(a) != len(b) {
 		return false
@@ -60,14 +69,16 @@ func NewRegion(points []geometry.Point) (Region, error) {
 	return Region{}, errors.New("region is not closed")
 }
 
-func findCycle(edges map[geometry.Segment]struct{}) ([]geometry.Point, error) {
-	adj := map[geometry.Point][]geometry.Point{}
-	var src geometry.Point
-	for edge := range edges {
-		adj[edge.P1] = append(adj[edge.P1], edge.P2)
-		adj[edge.P2] = append(adj[edge.P2], edge.P1)
-		src = edge.P1
-	}
+func findCycle(adj map[geometry.Point][]geometry.Point, src geometry.Point) ([]geometry.Point, error) {
+	regions := findCycles(adj, src)
+	if len(regions) == 0 {
+		return []geometry.Point{}, errors.New("cannot find cycle")
+	} 
+	return regions[0], nil
+}
+
+func findCycles(adj map[geometry.Point][]geometry.Point, src geometry.Point) [][]geometry.Point {
+	regions := [][]geometry.Point{}
 	queue := []geometry.Point{src}
 	visited := map[geometry.Point]bool{src: true}
 	pred := map[geometry.Point]*geometry.Point{src: nil}
@@ -94,7 +105,7 @@ func findCycle(edges map[geometry.Segment]struct{}) ([]geometry.Point, error) {
 				for i, uu := range predsU {
 					for j, vv := range predsV {
 						if uu == vv {
-							return append(predsU[:i+1], reverse(predsV[:j])...), nil
+							regions = append(regions, append(predsU[:i+1], reverse(predsV[:j])...))
 						}
 					}
 				}
@@ -102,7 +113,7 @@ func findCycle(edges map[geometry.Segment]struct{}) ([]geometry.Point, error) {
 		}
 	}
 
-	return []geometry.Point{}, errors.New("cannot find cycle")
+	return regions
 }
 
 func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
@@ -123,7 +134,14 @@ func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
 					edges[geometry.Segment{P1: segments[j].P1, P2: inter}] = struct{}{}
 					edges[geometry.Segment{P1: segments[j].P2, P2: inter}] = struct{}{}
 				}
-				if region, err := findCycle(edges); err == nil {
+				adj := map[geometry.Point][]geometry.Point{}
+				var src geometry.Point
+				for edge := range edges {
+					adj[edge.P1] = append(adj[edge.P1], edge.P2)
+					adj[edge.P2] = append(adj[edge.P2], edge.P1)
+					src = edge.P1
+				}
+				if region, err := findCycle(adj, src); err == nil {
 					return region, nil
 				}
 			}
