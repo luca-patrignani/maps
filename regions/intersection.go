@@ -1,6 +1,8 @@
 package regions
 
 import (
+	"math"
+
 	"github.com/luca-patrignani/maps/geometry"
 )
 
@@ -18,8 +20,9 @@ func (r Region) Intersection(other Region) (Region, error) {
 	adj := map[geometry.Point][]geometry.Point{}
 	adj = fillAdj(adj, r)
 	adj = fillAdj(adj, other)
-	//src := r[0]
-	
+	src := r[0]
+	_ = findCycles(adj, src)
+
 	return Region{}, nil
 }
 
@@ -33,4 +36,26 @@ func (r Region) IntersectionPoints(o Region) []geometry.Point {
 		}
 	}
 	return intersections
+}
+
+func countIntersection(segment geometry.Segment, segments []geometry.Segment) uint {
+	var counter uint = 0
+	for _, s := range segments {
+		if _, err := geometry.Intersection(segment, s); err == nil {
+			counter++
+		}
+	}
+	return counter
+}
+
+func (r Region) Contains(p geometry.Point) bool {
+	line := geometry.Segment{
+		P1: geometry.Point{
+			X: p.X,
+			Y: p.Y,
+		}, P2: geometry.Point{
+			X: math.MaxInt32,
+			Y: p.Y,
+		}}
+	return countIntersection(line, r.Sides())%2 == 1
 }

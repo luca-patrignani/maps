@@ -82,7 +82,7 @@ func TestSides(t *testing.T) {
 		geometry.Point{X: 10, Y: 0},
 		geometry.Point{X: 10, Y: 10},
 		geometry.Point{X: 0, Y: 10},
-	}	
+	}
 	expected := []geometry.Segment{
 		{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
 		{P1: geometry.Point{X: 10, Y: 0}, P2: geometry.Point{X: 10, Y: 10}},

@@ -55,3 +55,21 @@ func TestIntersection(t *testing.T) {
 	}
 
 }
+
+func TestIntersectionParallel(t *testing.T) {
+	segment1 := Segment{Point{0, 0}, Point{10, 0}}
+	segment2 := Segment{Point{0, 0}, Point{20, 0}}
+	_, err := Intersection(segment1, segment2)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestIntersectionParallelNotIntersect(t *testing.T) {
+	segment1 := Segment{Point{0, 0}, Point{3, 0}}
+	segment2 := Segment{Point{4, 0}, Point{20, 0}}
+	_, err := Intersection(segment1, segment2)
+	if err == nil {
+		t.Fatal()
+	}
+}

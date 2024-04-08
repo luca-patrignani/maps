@@ -55,3 +55,42 @@ func TestIntersectionPoints(t *testing.T) {
 		}
 	}
 }
+
+func TestContains(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: 2, Y: 2}
+	if !r.Contains(p) {
+		t.Fatal()
+	}
+}
+
+func TestNotContains(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: 20, Y: 42}
+	if r.Contains(p) {
+		t.Fatal()
+	}
+}
+
+func TestContainsVertices(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: 0, Y: 0}
+	if !r.Contains(p) {
+		t.Fatal()
+	}
+}

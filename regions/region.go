@@ -73,7 +73,7 @@ func findCycle(adj map[geometry.Point][]geometry.Point, src geometry.Point) ([]g
 	regions := findCycles(adj, src)
 	if len(regions) == 0 {
 		return []geometry.Point{}, errors.New("cannot find cycle")
-	} 
+	}
 	return regions[0], nil
 }
 
