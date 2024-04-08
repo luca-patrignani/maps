@@ -149,3 +149,38 @@ func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
 	}
 	return Region{}, errors.New("region is not closed")
 }
+
+func NewRegionsFromSegments(segments []geometry.Segment) []Region {
+	edges := map[geometry.Segment]struct{}{}
+	for _, segment := range segments {
+		edges[segment] = struct{}{}
+	}
+	for i := 0; i < len(segments); i++ {
+		for j := i + 1; j < len(segments); j++ {
+			if inter, err := geometry.Intersection(segments[i], segments[j]); err == nil {
+				if segments[i].P1 != inter && segments[i].P2 != inter {
+					delete(edges, segments[i])
+					edges[geometry.Segment{P1: segments[i].P1, P2: inter}] = struct{}{}
+					edges[geometry.Segment{P1: segments[i].P2, P2: inter}] = struct{}{}
+				}
+				if segments[j].P1 != inter && segments[j].P2 != inter {
+					delete(edges, segments[j])
+					edges[geometry.Segment{P1: segments[j].P1, P2: inter}] = struct{}{}
+					edges[geometry.Segment{P1: segments[j].P2, P2: inter}] = struct{}{}
+				}
+			}
+		}
+	}
+	adj := map[geometry.Point][]geometry.Point{}
+	for edge := range edges {
+		adj[edge.P1] = append(adj[edge.P1], edge.P2)
+		adj[edge.P2] = append(adj[edge.P2], edge.P1)
+	}
+	regions := []Region{}
+	for src := range adj {
+		for _, cycle := range findCycles(adj, src) {
+			regions = append(regions, cycle)
+		}
+	}
+	return regions
+}

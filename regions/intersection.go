@@ -1,6 +1,7 @@
 package regions
 
 import (
+	"errors"
 	"math"
 
 	"github.com/luca-patrignani/maps/geometry"
@@ -17,13 +18,19 @@ func fillAdj(adj map[geometry.Point][]geometry.Point, region Region) map[geometr
 }
 
 func (r Region) Intersection(other Region) (Region, error) {
-	adj := map[geometry.Point][]geometry.Point{}
-	adj = fillAdj(adj, r)
-	adj = fillAdj(adj, other)
-	src := r[0]
-	_ = findCycles(adj, src)
-
-	return Region{}, nil
+	for _, region := range NewRegionsFromSegments(append(r.Sides(), other.Sides()...)) {
+		found := true
+		for _, p := range r.IntersectionPoints(other) {
+			if !region.Contains(p) {
+				found = false
+				break
+			}
+		}
+		if found {
+			return region, nil
+		}
+	}
+	return Region{}, errors.New("the regions are not intersecting")
 }
 
 func (r Region) IntersectionPoints(o Region) []geometry.Point {
@@ -49,6 +56,11 @@ func countIntersection(segment geometry.Segment, segments []geometry.Segment) ui
 }
 
 func (r Region) Contains(p geometry.Point) bool {
+	for _, vertex := range r {
+		if p == vertex {
+			return true
+		}
+	}
 	line := geometry.Segment{
 		P1: geometry.Point{
 			X: p.X,
