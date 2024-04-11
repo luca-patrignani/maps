@@ -52,9 +52,11 @@ func main() {
 			panic(err)
 		}
 	}
+	nations := []regions.Region{}
 
 	running := true
 	pressed := false
+	drawNation := false
 	for running {
 		renderer.SetDrawColor(0, 0, 0, 255)
 		renderer.Clear()
@@ -76,15 +78,36 @@ func main() {
 					pressed = false
 					fmt.Println("Mouse", t.Which, "button", t.Button, "released at", t.X, t.Y)
 					if region, err := rb.Build(); err == nil {
-						ir.Save(island.Island{Name: "1", Region: region})
+						if drawNation {
+							for _, island := range ir.Islands() {
+								if nation, err := region.Intersection(island.Region); err == nil {
+									nations = append(nations, nation)
+									break
+								}
+							}
+							fmt.Println(nations)
+						} else {
+							ir.Save(island.Island{Name: "1", Region: region})
+						}
 					}
 					rb = regions.RegionBuilder{}
 				}
+			case *sdl.KeyboardEvent:
+				if t.Keysym.Sym == sdl.K_n && t.Type == sdl.KEYUP {
+					drawNation = !drawNation
+					if drawNation {
+						fmt.Println("Draw nation mode")
+					} else {
+						fmt.Println("Normal mode")
+					}
+				}
 			}
-
 		}
 		for _, island := range ir.Islands() {
-			drawIsland(renderer, island, sdl.Color{R: 255, G: 0, B: 0, A: 255})
+			drawRegion(renderer, island.Region, sdl.Color{R: 255, G: 0, B: 0, A: 255})
+		}
+		for _, nation := range nations {
+			drawRegion(renderer, nation, sdl.Color{R: 0, G: 0, B: 255, A: 255})
 		}
 		renderer.SetDrawColor(0, 255, 0, 255)
 		for _, segment := range rb.Segments {
@@ -94,10 +117,10 @@ func main() {
 	}
 }
 
-func drawIsland(renderer *sdl.Renderer, island island.Island, color sdl.Color) {
+func drawRegion(renderer *sdl.Renderer, region regions.Region, color sdl.Color) {
 	vx := []int16{}
 	vy := []int16{}
-	for _, point := range island.Region {
+	for _, point := range region {
 		vx = append(vx, int16(point.X))
 		vy = append(vy, int16(point.Y))
 	}
