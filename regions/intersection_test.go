@@ -30,7 +30,7 @@ func TestIntersection(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !actual.Equals(expected) {
-		t.Fatal("regions are not equal")
+		t.Fatalf("expected %v and actual %v are not equal", expected, actual)
 	}
 }
 

@@ -7,16 +7,6 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 )
 
-func fillAdj(adj map[geometry.Point][]geometry.Point, region Region) map[geometry.Point][]geometry.Point {
-	for i := 1; i < len(region); i++ {
-		adj[region[i]] = append(adj[region[i]], region[i-1])
-		adj[region[i-1]] = append(adj[region[i-1]], region[i])
-	}
-	adj[region[0]] = append(adj[region[0]], region[len(region)-1])
-	adj[region[len(region)-1]] = append(adj[region[len(region)-1]], region[0])
-	return adj
-}
-
 func (r Region) Intersection(other Region) (Region, error) {
 	for _, region := range NewRegionsFromSegments(append(r.Sides(), other.Sides()...)) {
 		found := true

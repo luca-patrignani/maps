@@ -76,6 +76,40 @@ func TestNewRegionFromSegmentsLongEdges(t *testing.T) {
 	}
 }
 
+func TestNewRegionFromSegmentsUpRightEnd(t *testing.T) {
+	segments := []geometry.Segment{
+		{P1: geometry.Point{X: 2, Y: 0}, P2: geometry.Point{X: 1, Y: 0}},
+		{P1: geometry.Point{X: 1, Y: 0}, P2: geometry.Point{X: 0, Y: 0}},
+
+		{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 0, Y: 1}},
+		{P1: geometry.Point{X: 0, Y: 1}, P2: geometry.Point{X: 0, Y: 2}},
+
+		{P1: geometry.Point{X: 0, Y: 2}, P2: geometry.Point{X: 1, Y: 2}},
+		{P1: geometry.Point{X: 1, Y: 2}, P2: geometry.Point{X: 2, Y: 2}},
+
+		{P1: geometry.Point{X: 2, Y: 2}, P2: geometry.Point{X: 2, Y: 1}},
+		{P1: geometry.Point{X: 2, Y: 1}, P2: geometry.Point{X: 2, Y: 0}},
+		{P1: geometry.Point{X: 2, Y: 0}, P2: geometry.Point{X: 2, Y: -1}},
+	}
+	actual, err := NewRegionFromSegments(segments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 1, Y: 0},
+		geometry.Point{X: 2, Y: 0},
+		geometry.Point{X: 2, Y: 1},
+		geometry.Point{X: 2, Y: 2},
+		geometry.Point{X: 1, Y: 2},
+		geometry.Point{X: 0, Y: 2},
+		geometry.Point{X: 0, Y: 1},
+	}
+	if !actual.Equals(expected) {
+		t.Fatal(expected, actual)
+	}
+}
+
 func TestSides(t *testing.T) {
 	r := Region{
 		geometry.Point{X: 0, Y: 0},
