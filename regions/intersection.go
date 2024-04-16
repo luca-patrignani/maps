@@ -4,31 +4,53 @@ import (
 	"errors"
 	"math"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 )
 
+func (r Region) containsAll(points []geometry.Point) bool {
+	for _, p := range points {
+		if !r.Contains(p) {
+			return false
+		}
+	}
+	return true
+}
+
 func (r Region) Intersection(other Region) (Region, error) {
-	for _, region := range NewRegionsFromSegments(append(r.Sides(), other.Sides()...)) {
-		found := true
-		for _, p := range r.IntersectionPoints(other) {
-			if !region.Contains(p) {
-				found = false
-				break
-			}
+	union := mapset.NewSet[geometry.Point]()
+	for _, p := range append(r, other...) {
+		if r.Contains(p) && other.Contains(p) {
+			union.Add(p)
 		}
-		if found {
-			return region, nil
+	}
+	segments := []geometry.Segment{}
+	for _, side := range append(r.Sides(), other.Sides()...) {
+		if union.Contains(side.P1) || union.Contains(side.P2) {
+			segments = append(segments, side)
 		}
+	}
+	if region, err := NewRegionFromSegments(segments); err == nil {
+		return region, nil
 	}
 	return Region{}, errors.New("the regions are not intersecting")
 }
 
-func (r Region) IntersectionPoints(o Region) []geometry.Point {
-	intersections := []geometry.Point{}
+func (r Region) fillAdj(points mapset.Set[geometry.Point], adj map[geometry.Point][]geometry.Point) {
+	for _, side := range r.Sides() {
+		if points.Contains(side.P1) && points.Contains(side.P2) {
+			adj[side.P1] = append(adj[side.P1], side.P2)
+			adj[side.P2] = append(adj[side.P1], side.P1)
+		}
+	}
+}
+
+func (r Region) IntersectionPoints(o Region) mapset.Set[geometry.Point] {
+	intersections := mapset.NewSet[geometry.Point]()
 	for _, rs := range r.Sides() {
 		for _, os := range o.Sides() {
 			if inter, err := geometry.Intersection(rs, os); err == nil {
-				intersections = append(intersections, inter)
+				intersections.Add(inter)
 			}
 		}
 	}

@@ -7,4 +7,7 @@ require (
 	github.com/veandco/go-sdl2 v0.4.38
 )
 
-require golang.org/x/text v0.14.0 // indirect
+require (
+	github.com/deckarep/golang-set/v2 v2.6.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+)
