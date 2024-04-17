@@ -1,6 +1,4 @@
-
 package main
-
 
 import (
 	"fmt"
@@ -67,7 +65,10 @@ func main() {
 				running = false
 			case *sdl.MouseMotionEvent:
 				if pressed {
-					newPoint := geometry.Point{X: t.X / scale, Y: t.Y / scale}
+					newPoint := geometry.Point{
+						X: float64(t.X / int32(scale)),
+						Y: float64(t.Y / int32(scale)),
+					}
 					rb.AddPoint(newPoint)
 				}
 			case *sdl.MouseButtonEvent:
@@ -111,7 +112,7 @@ func main() {
 		}
 		renderer.SetDrawColor(0, 255, 0, 255)
 		for _, segment := range rb.Segments {
-			renderer.DrawLine(segment.P1.X, segment.P1.Y, segment.P2.X, segment.P2.Y)
+			renderer.DrawLine(int32(segment.P1.X), int32(segment.P1.Y), int32(segment.P2.X), int32(segment.P2.Y))
 		}
 		renderer.Present()
 	}

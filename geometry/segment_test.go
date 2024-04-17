@@ -9,7 +9,7 @@ func TestIntersectionOdd(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if intersection != (Point{2, 2}) {
+	if intersection != (Point{2.5, 2.5}) {
 		t.Errorf("expected %v, actual %v", Point{2, 2}, intersection)
 	}
 }
@@ -110,6 +110,38 @@ func TestIntersection2(t *testing.T) {
 	}
 	actual := Point{1, 0}
 	if inter != actual {
+		t.Fatal()
+	}
+}
+
+func TestIsParallelToDiagonal(t *testing.T) {
+	segment1 := Segment{Point{1, 1}, Point{2, 2}}
+	segment2 := Segment{Point{5, 5}, Point{-2, -2}}
+	if !segment1.IsParallelTo(segment2) {
+		t.Fatal()
+	}
+}
+
+func TestIsParallelToHorizontal(t *testing.T) {
+	segment1 := Segment{Point{1, 0}, Point{2, 0}}
+	segment2 := Segment{Point{5, 0}, Point{-2, 0}}
+	if !segment1.IsParallelTo(segment2) {
+		t.Fatal()
+	}
+}
+
+func TestIsParallelToVertical(t *testing.T) {
+	segment1 := Segment{Point{1, 0}, Point{1, 2}}
+	segment2 := Segment{Point{5, 0}, Point{5, -2}}
+	if !segment1.IsParallelTo(segment2) {
+		t.Fatal()
+	}
+}
+
+func TestNotIsParallelTo(t *testing.T) {
+	segment1 := Segment{Point{0, 0}, Point{1, 0}}
+	segment2 := Segment{Point{0, 0}, Point{0, 1}}
+	if segment1.IsParallelTo(segment2) {
 		t.Fatal()
 	}
 }
