@@ -114,6 +114,16 @@ func TestIntersection2(t *testing.T) {
 	}
 }
 
+func TestIntersectionParallelButNotIntersecting(t *testing.T) {
+	s1 := Segment{P1: Point{X: 31, Y: 4}, P2: Point{X: 31, Y: 5}}
+	s2 := Segment{P1: Point{X: 31, Y: 7}, P2: Point{X: 31, Y: 8}}
+	inter, err := Intersection(s1, s2)
+	if err == nil {
+		t.Fatal(inter)
+	}
+}
+
+
 func TestIsParallelToDiagonal(t *testing.T) {
 	segment1 := Segment{Point{1, 1}, Point{2, 2}}
 	segment2 := Segment{Point{5, 5}, Point{-2, -2}}
