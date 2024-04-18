@@ -71,6 +71,27 @@ func TestIntersectionShortSegments(t *testing.T) {
 	}
 }
 
+func TestIntersectionOneContainsOther(t *testing.T) {
+	r1 := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	r2 := Region{
+		geometry.Point{X: 2, Y: 2},
+		geometry.Point{X: 2, Y: 5},
+		geometry.Point{X: 6, Y: 8},
+	}
+	actual, err := r1.Intersection(r2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !actual.Equals(r2) {
+		t.Fatalf("expected %v and actual %v are not equal", r2, actual)
+	}
+}
+
 func TestIntersectionPoints(t *testing.T) {
 	r1 := Region{
 		geometry.Point{X: 0, Y: 0},
