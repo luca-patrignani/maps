@@ -74,10 +74,8 @@ func main() {
 			case *sdl.MouseButtonEvent:
 				if t.State == sdl.PRESSED {
 					pressed = true
-					fmt.Println("Mouse", t.Which, "button", t.Button, "pressed at", t.X, t.Y)
 				} else {
 					pressed = false
-					fmt.Println("Mouse", t.Which, "button", t.Button, "released at", t.X, t.Y)
 					if region, err := rb.Build(); err == nil {
 						if drawNation {
 							for _, island := range ir.Islands() {
@@ -88,7 +86,16 @@ func main() {
 							}
 							fmt.Println(nations)
 						} else {
-							ir.Save(island.Island{Name: "1", Region: region})
+							intersect := false
+							for _, island := range ir.Islands() {
+								if _, err := island.Region.Intersection(region); err == nil {
+									intersect = true
+									break
+								}
+							}
+							if !intersect {
+								ir.Save(island.Island{Name: "1", Region: region})
+							}
 						}
 					}
 					rb = regions.RegionBuilder{}
