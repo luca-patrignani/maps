@@ -155,3 +155,35 @@ func TestNotIsParallelTo(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestContains(t *testing.T) {
+	s := Segment{Point{1, 1}, Point{10, 10}}
+	p := Point{4, 4}
+	if !s.Contains(p) {
+		t.Fatal(s, p)
+	}
+}
+
+func TestContainsVertical(t *testing.T) {
+	s := Segment{Point{1, 1}, Point{1, 10}}
+	p := Point{1, 4}
+	if !s.Contains(p) {
+		t.Fatal(s, p)
+	}
+}
+
+func TestNotContains(t *testing.T) {
+	s := Segment{Point{1, 1}, Point{10, 10}}
+	p := Point{20, 14}
+	if s.Contains(p) {
+		t.Fatal(s, p)
+	}
+}
+
+func TestNotContainsVertical(t *testing.T) {
+	s := Segment{Point{1, 1}, Point{1, 10}}
+	p := Point{1, 40}
+	if s.Contains(p) {
+		t.Fatal(s, p)
+	}
+}

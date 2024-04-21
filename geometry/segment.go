@@ -74,3 +74,12 @@ func (segment1 Segment) IsParallelTo(segment2 Segment) bool {
 func (s Segment) Length() float64 {
 	return s.P1.Distance(s.P2)
 }
+
+func (s Segment) Contains(p Point) bool {
+	if s.P1.X == s.P2.X {
+		return s.P1.X == p.X && math.Min(s.P1.Y, s.P2.Y) <= p.Y && p.Y <= math.Max(s.P1.Y, s.P2.Y)
+	}
+	m := (s.P1.Y - s.P2.Y) / (s.P1.X - s.P2.X)
+	q := s.P1.Y - (m * s.P1.X)
+	return p.X*m+q == p.Y && math.Min(s.P1.X, s.P2.X) <= p.X && p.X <= math.Max(s.P1.X, s.P2.X)
+}
