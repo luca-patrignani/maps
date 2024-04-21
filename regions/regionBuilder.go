@@ -22,6 +22,11 @@ func (rb RegionBuilder) Build() (Region, error) {
 	if len(rb.Segments) < 3 {
 		return Region{}, errors.New("not enough segments for closing a region")
 	}
+	simplified := rb.Simplify()
+	return NewRegionFromSegments(simplified)
+}
+
+func (rb RegionBuilder) Simplify() []geometry.Segment {
 	simplified := []geometry.Segment{rb.Segments[0]}
 	for _, s := range rb.Segments[1:] {
 		if welded, err := weld(simplified[len(simplified)-1], s); err == nil {
@@ -30,7 +35,7 @@ func (rb RegionBuilder) Build() (Region, error) {
 			simplified = append(simplified, s)
 		}
 	}
-	return NewRegionFromSegments(simplified)
+	return simplified
 }
 
 func weld(s1 geometry.Segment, s2 geometry.Segment) (geometry.Segment, error) {

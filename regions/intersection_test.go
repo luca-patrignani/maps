@@ -164,3 +164,28 @@ func TestContainsVertices2(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestNotContains2(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: -5, Y: 0}
+	if r.Contains(p) {
+		t.Fatal()
+	}
+}
+
+func TestNotContains3(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: -5, Y: 0}
+	if r.Contains(p) {
+		t.Fatal()
+	}
+}

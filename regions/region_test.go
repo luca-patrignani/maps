@@ -110,6 +110,29 @@ func TestNewRegionFromSegmentsUpRightEnd(t *testing.T) {
 	}
 }
 
+func TestOpenSpiral(t *testing.T) {
+	segments := []geometry.Segment{
+		{P1: geometry.Point{X: 27, Y: 3}, P2: geometry.Point{X: 30, Y: 3}}, 
+		{P1: geometry.Point{X: 30, Y: 3}, P2: geometry.Point{X: 30, Y: 4}}, 
+		{P1: geometry.Point{X: 30, Y: 4}, P2: geometry.Point{X: 31, Y: 4}}, 
+		{P1: geometry.Point{X: 31, Y: 4}, P2: geometry.Point{X: 31, Y: 5}}, 
+		{P1: geometry.Point{X: 31, Y: 5}, P2: geometry.Point{X: 32, Y: 5}}, 
+		{P1: geometry.Point{X: 32, Y: 5}, P2: geometry.Point{X: 32, Y: 7}}, 
+		{P1: geometry.Point{X: 32, Y: 7}, P2: geometry.Point{X: 31, Y: 7}}, 
+		{P1: geometry.Point{X: 31, Y: 7}, P2: geometry.Point{X: 31, Y: 8}}, 
+		{P1: geometry.Point{X: 31, Y: 8}, P2: geometry.Point{X: 30, Y: 9}}, 
+		{P1: geometry.Point{X: 30, Y: 9}, P2: geometry.Point{X: 28, Y: 9}}, 
+		{P1: geometry.Point{X: 28, Y: 9}, P2: geometry.Point{X: 28, Y: 8}}, 
+		{P1: geometry.Point{X: 28, Y: 8}, P2: geometry.Point{X: 27, Y: 8}}, 
+		{P1: geometry.Point{X: 28, Y: 8}, P2: geometry.Point{X: 28, Y: 7}}, 
+		{P1: geometry.Point{X: 28, Y: 7}, P2: geometry.Point{X: 29, Y: 7}},
+	}
+	_, err := NewRegionFromSegments(segments)
+	if err == nil {
+		t.Fatal()
+	}
+}
+
 func TestSides(t *testing.T) {
 	r := Region{
 		geometry.Point{X: 0, Y: 0},

@@ -121,18 +121,18 @@ func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
 	for _, segment := range segments {
 		edges[segment] = struct{}{}
 	}
-	for i := 0; i < len(segments); i++ {
-		for j := i + 1; j < len(segments); j++ {
-			if inter, err := geometry.Intersection(segments[i], segments[j]); err == nil {
-				if segments[i].P1 != inter && segments[i].P2 != inter {
-					delete(edges, segments[i])
-					edges[geometry.Segment{P1: segments[i].P1, P2: inter}] = struct{}{}
-					edges[geometry.Segment{P1: segments[i].P2, P2: inter}] = struct{}{}
+	for i, si := range segments {
+		for _, sj := range segments[i+1:] {
+			if inter, err := geometry.Intersection(si, sj); err == nil {
+				if si.P1 != inter && si.P2 != inter {
+					delete(edges, si)
+					edges[geometry.Segment{P1: si.P1, P2: inter}] = struct{}{}
+					edges[geometry.Segment{P1: si.P2, P2: inter}] = struct{}{}
 				}
-				if segments[j].P1 != inter && segments[j].P2 != inter {
-					delete(edges, segments[j])
-					edges[geometry.Segment{P1: segments[j].P1, P2: inter}] = struct{}{}
-					edges[geometry.Segment{P1: segments[j].P2, P2: inter}] = struct{}{}
+				if sj.P1 != inter && sj.P2 != inter {
+					delete(edges, sj)
+					edges[geometry.Segment{P1: sj.P1, P2: inter}] = struct{}{}
+					edges[geometry.Segment{P1: sj.P2, P2: inter}] = struct{}{}
 				}
 				adj := map[geometry.Point][]geometry.Point{}
 				var src geometry.Point

@@ -24,6 +24,7 @@ func (r Region) Intersection(other Region) (Region, error) {
 			union.Add(p)
 		}
 	}
+	union.Append(r.IntersectionPoints(other).ToSlice()...)
 	segments := []geometry.Segment{}
 	for _, side := range append(r.Sides(), other.Sides()...) {
 		if union.Contains(side.P1) || union.Contains(side.P2) {
@@ -57,10 +58,13 @@ func (r Region) IntersectionPoints(o Region) mapset.Set[geometry.Point] {
 	return intersections
 }
 
-func countIntersection(segment geometry.Segment, segments []geometry.Segment) uint {
+func (region Region) countIntersections(segment geometry.Segment) uint {
 	var counter uint = 0
-	for _, s := range segments {
-		if _, err := geometry.Intersection(segment, s); err == nil {
+	for _, s := range region.Sides() {
+		if inter, err := geometry.Intersection(segment, s); err == nil {
+			if inter == s.P1 {
+
+			}
 			counter++
 		}
 	}
@@ -68,6 +72,9 @@ func countIntersection(segment geometry.Segment, segments []geometry.Segment) ui
 }
 
 func (r Region) Contains(p geometry.Point) bool {
+	/*
+	The issue is solved as follows: If the intersection point is a vertex of a tested polygon side, then the intersection counts only if the other vertex of the side lies below the ray. This is effectively equivalent to considering vertices on the ray as lying slightly above the ray.
+	*/
 	for _, vertex := range r {
 		if p == vertex {
 			return true
@@ -77,9 +84,27 @@ func (r Region) Contains(p geometry.Point) bool {
 		P1: geometry.Point{
 			X: p.X,
 			Y: p.Y,
-		}, P2: geometry.Point{
+		},
+		P2: geometry.Point{
 			X: math.MaxInt32,
 			Y: p.Y,
-		}}
-	return countIntersection(line, r.Sides())%2 == 1
+		},
+	}
+	var counter uint = 0
+	for _, s := range r.Sides() {
+		if inter, err := geometry.Intersection(line, s); err == nil {
+			if inter != s.P1 && inter != s.P2 {
+				counter++
+			} else {
+				if inter == s.P1 && s.P2.Y < p.Y {
+					counter++
+				} else {
+					if inter == s.P2 && s.P1.Y < p.Y {
+						counter++
+					}
+				}
+			}
+		}
+	}
+	return counter%2 == 1
 }

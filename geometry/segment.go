@@ -26,7 +26,7 @@ func Intersection(segment1, segment2 Segment) (Point, error) {
 
 	if math.IsNaN(t) || math.IsNaN(u) {
 		//the segments are parallel
-		if x1 == x2 && x2 == x3 {
+		if x1 == x2 && x3 == x4 {
 			//the segments are parallel to the y axis
 			if math.Min(y1, y2) <= y3 && y3 <= math.Max(y1, y2) {
 				return segment2.P1, nil
@@ -41,6 +41,12 @@ func Intersection(segment1, segment2 Segment) (Point, error) {
 		m2 := (y3 - y4) / (x3 - x4)
 		q2 := y3 - (m2 * x3)
 		if q1 == q2 {
+			if math.Min(x3, x4) <= x1 && x1 <= math.Max(x3, x4) {
+				return segment1.P1, nil
+			}
+			if math.Min(x3, x4) <= x2 && x2 <= math.Max(x3, x4) {
+				return segment1.P2, nil
+			}
 			if math.Min(x1, x2) <= x3 && x3 <= math.Max(x1, x2) {
 				return segment2.P1, nil
 			}

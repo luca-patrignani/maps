@@ -82,3 +82,27 @@ func TestBuildWelded(t *testing.T) {
 		t.Fatal(expected, actual)
 	}
 }
+
+func TestRB(t *testing.T) {
+	rb := RegionBuilder{}
+	rb.addAll([]geometry.Point{
+		{X: 2, Y: 0},
+		{X: 2, Y: 2},
+		{X: 0, Y: 2},
+		{X: 0, Y: 1},
+		{X: 5, Y: 1},
+	})
+	actual, err := rb.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := Region{
+		geometry.Point{X: 2, Y: 1},
+		geometry.Point{X: 2, Y: 2},
+		geometry.Point{X: 0, Y: 2},
+		geometry.Point{X: 0, Y: 1},
+	}
+	if !actual.Equals(expected) {
+		t.Fatal(expected, actual)
+	}
+}
