@@ -3,7 +3,6 @@ package regions
 import (
 	"errors"
 
-	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 )
 
@@ -114,28 +113,37 @@ func findCycles(adj map[geometry.Point][]geometry.Point, src geometry.Point) [][
 		}
 	}
 
+
 	return regions
 }
 
 func intersectSegments(segments []geometry.Segment) []geometry.Segment {
-	edges := mapset.NewSet(segments...)
-	for i, si := range segments {
-		for _, sj := range segments[i+1:] {
+	edges := append([]geometry.Segment{}, segments...)
+	result := []geometry.Segment{}
+	for len(edges) > 0 {
+		si := edges[0]
+		edges = edges[1:]
+		intersect := false
+		l := len(edges)
+		for j := 0; j < l; j++ {
+			sj := edges[j]
 			if inter, err := geometry.Intersection(si, sj); err == nil {
 				if si.P1 != inter && si.P2 != inter {
-					edges.Remove(si)
-					edges.Add(geometry.Segment{P1: si.P1, P2: inter})
-					edges.Add(geometry.Segment{P1: si.P2, P2: inter})
+					edges = append(edges, geometry.Segment{P1: si.P1, P2: inter}, geometry.Segment{P1: si.P2, P2: inter})
+					intersect = true
+					break
 				}
 				if sj.P1 != inter && sj.P2 != inter {
-					edges.Remove(sj)
-					edges.Add(geometry.Segment{P1: sj.P1, P2: inter})
-					edges.Add(geometry.Segment{P1: sj.P2, P2: inter})
+					edges = append(edges, si)
+					intersect = true
 				}
 			}
 		}
+		if !intersect {
+			result = append(result, si)
+		}
 	}
-	return edges.ToSlice()
+	return result
 }
 
 func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
