@@ -3,6 +3,7 @@ package regions
 import (
 	"errors"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 )
 
@@ -116,36 +117,38 @@ func findCycles(adj map[geometry.Point][]geometry.Point, src geometry.Point) [][
 	return regions
 }
 
-func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
-	edges := map[geometry.Segment]struct{}{}
-	for _, segment := range segments {
-		edges[segment] = struct{}{}
-	}
+func intersectSegments(segments []geometry.Segment) []geometry.Segment {
+	edges := mapset.NewSet(segments...)
 	for i, si := range segments {
 		for _, sj := range segments[i+1:] {
 			if inter, err := geometry.Intersection(si, sj); err == nil {
 				if si.P1 != inter && si.P2 != inter {
-					delete(edges, si)
-					edges[geometry.Segment{P1: si.P1, P2: inter}] = struct{}{}
-					edges[geometry.Segment{P1: si.P2, P2: inter}] = struct{}{}
+					edges.Remove(si)
+					edges.Add(geometry.Segment{P1: si.P1, P2: inter})
+					edges.Add(geometry.Segment{P1: si.P2, P2: inter})
 				}
 				if sj.P1 != inter && sj.P2 != inter {
-					delete(edges, sj)
-					edges[geometry.Segment{P1: sj.P1, P2: inter}] = struct{}{}
-					edges[geometry.Segment{P1: sj.P2, P2: inter}] = struct{}{}
-				}
-				adj := map[geometry.Point][]geometry.Point{}
-				var src geometry.Point
-				for edge := range edges {
-					adj[edge.P1] = append(adj[edge.P1], edge.P2)
-					adj[edge.P2] = append(adj[edge.P2], edge.P1)
-					src = edge.P1
-				}
-				if region, err := findCycle(adj, src); err == nil {
-					return region, nil
+					edges.Remove(sj)
+					edges.Add(geometry.Segment{P1: sj.P1, P2: inter})
+					edges.Add(geometry.Segment{P1: sj.P2, P2: inter})
 				}
 			}
 		}
+	}
+	return edges.ToSlice()
+}
+
+func NewRegionFromSegments(segments []geometry.Segment) (Region, error) {
+	edges := intersectSegments(segments)
+	adj := map[geometry.Point][]geometry.Point{}
+	var src geometry.Point
+	for _, edge := range edges {
+		adj[edge.P1] = append(adj[edge.P1], edge.P2)
+		adj[edge.P2] = append(adj[edge.P2], edge.P1)
+		src = edge.P1
+	}
+	if region, err := findCycle(adj, src); err == nil {
+		return region, nil
 	}
 	return Region{}, errors.New("region is not closed")
 }

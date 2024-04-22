@@ -9,17 +9,11 @@ import (
 )
 
 func (r Region) Intersection(other Region) (Region, error) {
-	union := mapset.NewSet[geometry.Point]()
-	for _, p := range append(r, other...) {
-		if r.Contains(p) && other.Contains(p) {
-			union.Add(p)
-		}
-	}
-	union.Append(r.IntersectionPoints(other).ToSlice()...)
+	allSegments := intersectSegments(append(r.Sides(), other.Sides()...))
 	segments := []geometry.Segment{}
-	for _, side := range append(r.Sides(), other.Sides()...) {
-		if union.Contains(side.P1) || union.Contains(side.P2) {
-			segments = append(segments, side)
+	for _, s := range allSegments {
+		if r.Contains(s.P1) && other.Contains(s.P1) && r.Contains(s.P2) && other.Contains(s.P2) {
+			segments = append(segments, s)
 		}
 	}
 	if region, err := NewRegionFromSegments(segments); err == nil {
