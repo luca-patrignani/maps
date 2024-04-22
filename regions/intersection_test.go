@@ -189,3 +189,16 @@ func TestNotContains3(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestNotContainsLeftSide(t *testing.T) {
+	r := Region{
+		geometry.Point{X: 0, Y: 0},
+		geometry.Point{X: 10, Y: 0},
+		geometry.Point{X: 10, Y: 10},
+		geometry.Point{X: 0, Y: 10},
+	}
+	p := geometry.Point{X: 0, Y: 5}
+	if !r.Contains(p) {
+		t.Fatal()
+	}
+}
