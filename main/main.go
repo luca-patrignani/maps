@@ -34,7 +34,7 @@ func main() {
 		W: 100,
 		H: 100,
 	})
-	var scale int32 = 20
+	var scale int32 = 5
 	renderer.SetScale(float32(scale), float32(scale))
 	rb := regions.RegionBuilder{}
 	if err := os.MkdirAll("./maps", fs.ModePerm); err != nil {

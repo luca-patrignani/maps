@@ -92,7 +92,7 @@ func TestIntersectionOneContainsOther(t *testing.T) {
 	}
 }
 
-func _TestIntersectionUp(t *testing.T) {
+func TestIntersectionUp(t *testing.T) {
 	r1 := Region{
 		geometry.Point{X: 0, Y: 0},
 		geometry.Point{X: 10, Y: 0},
@@ -230,3 +230,23 @@ func TestNotContainsLeftSide(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+// func TestBig(t *testing.T) {
+// 	rr := Region{
+// 		{X: 273, Y: 33},
+// 		{X: 273, Y: 28},
+//         {X: 272, Y: 28},
+//         {X: 272, Y: 27},
+//         {X: 271, Y: 27},
+// 	}
+// 	oo := Region{
+// 		{X: 262, Y: 28},
+//         {X: 273, Y: 28},
+//         {X: 276, Y: 29},
+//         {X: 279, Y: 29},
+// 	}
+// 	region := Region{
+//         {X: 272, Y: 28},
+//         {X: 273, Y: 28},
+// 	}
+// }

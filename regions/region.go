@@ -2,7 +2,9 @@ package regions
 
 import (
 	"errors"
+	"fmt"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 )
 
@@ -54,8 +56,7 @@ func NewRegion(points []geometry.Point) (Region, error) {
 	for i := 1; i < len(points); i++ {
 		newEdge := geometry.Segment{P1: points[i-1], P2: points[i]}
 		for j := 0; j < len(edges)-1; j++ {
-			inter, err := geometry.Intersection(newEdge, edges[j])
-			if err == nil {
+			if inter, ok := geometry.Intersection(newEdge, edges[j]).(geometry.Point); ok {
 				edges = append(edges, newEdge)
 				region := Region{inter}
 				for k := j; edges[k].P2 != newEdge.P2; k++ {
@@ -96,7 +97,11 @@ func findCycle(adj map[geometry.Point][]geometry.Point, src geometry.Point) ([]g
 				for i, uu := range predsU {
 					for j, vv := range predsV {
 						if uu == vv {
-							return append(predsU[:i+1], reverse(predsV[:j])...), nil
+							region := append(predsU[:i+1], reverse(predsV[:j])...)
+							if len(region) < 3 {
+								fmt.Println(region)
+							}
+							return region, nil
 						}
 					}
 				}
@@ -107,28 +112,44 @@ func findCycle(adj map[geometry.Point][]geometry.Point, src geometry.Point) ([]g
 }
 
 func intersectSegments(segments []geometry.Segment) []geometry.Segment {
-	edges := append([]geometry.Segment{}, segments...)
+	edges := mapset.NewSet(segments...)
 	result := []geometry.Segment{}
-	for len(edges) > 0 {
-		si := edges[0]
-		edges = edges[1:]
-		intersect := false
-		l := len(edges)
-		for j := 0; j < l; j++ {
-			sj := edges[j]
-			if inter, err := geometry.Intersection(si, sj); err == nil {
-				if si.P1 != inter && si.P2 != inter {
-					edges = append(edges, geometry.Segment{P1: si.P1, P2: inter}, geometry.Segment{P1: si.P2, P2: inter})
-					intersect = true
-					break
-				}
-				if sj.P1 != inter && sj.P2 != inter {
-					edges = append(edges, si)
-					intersect = true
+	for edges.Cardinality() > 0 {
+		si := edges.ToSlice()[0]
+		for _, sj := range edges.ToSlice() {
+			if si != sj {
+				switch inter := geometry.Intersection(si, sj).(type) {
+				case geometry.Point:
+					if si.P1 != inter && si.P2 != inter {
+						edges.Remove(si)
+						edges.Append(geometry.Segment{P1: si.P1, P2: inter}, geometry.Segment{P1: si.P2, P2: inter})
+					}
+					if sj.P1 != inter && sj.P2 != inter {
+						edges.Remove(sj)
+						edges.Append(geometry.Segment{P1: sj.P1, P2: inter}, geometry.Segment{P1: sj.P2, P2: inter})
+					}
+				case geometry.Segment:
+					edges.Remove(si)
+					edges.Remove(sj)
+					edges.Add(inter)
+					points := []geometry.Point{si.P1, si.P2, sj.P1, sj.P2}					
+					for _, p := range points {
+						if p != inter.P1 && p != inter.P2 {
+							if p.Distance(inter.P1) < p.Distance(inter.P2) {
+								edges.Add(geometry.Segment{P1: p, P2: inter.P1})
+							} else {
+								edges.Add(geometry.Segment{P1: p, P2: inter.P2})
+							}
+						}
+					}
 				}
 			}
+			if !edges.Contains(si) {
+				break
+			}
 		}
-		if !intersect {
+		if edges.Contains(si) {
+			edges.Remove(si)
 			result = append(result, si)
 		}
 	}

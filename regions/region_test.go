@@ -3,6 +3,7 @@ package regions
 import (
 	"testing"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 )
 
@@ -154,5 +155,20 @@ func TestSides(t *testing.T) {
 		if actual[i] != expected[i] {
 			t.Fatal(actual[i], "!=", expected[i])
 		}
+	}
+}
+
+func TestIntersectSegments(t *testing.T) {
+	segments := []geometry.Segment{
+		{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
+		{P1: geometry.Point{X: 9, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
+	}
+	expected := mapset.NewSet(
+		geometry.Segment{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 9, Y: 0}},
+		geometry.Segment{P1: geometry.Point{X: 9, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
+	)
+	actual := mapset.NewSet(intersectSegments(segments)...)
+	if !expected.Equal(actual) {
+		t.Fatal(expected, actual)
 	}
 }

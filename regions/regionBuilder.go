@@ -39,7 +39,7 @@ func (rb RegionBuilder) Simplify() []geometry.Segment {
 }
 
 func weld(s1 geometry.Segment, s2 geometry.Segment) (geometry.Segment, error) {
-	if _, err := geometry.Intersection(s1, s2); err == nil && s1.IsParallelTo(s2) {
+	if geometry.Intersection(s1, s2) != nil && s1.IsParallelTo(s2) {
 		segments := []geometry.Segment{
 			{P1: s1.P1, P2: s2.P1},
 			{P1: s1.P1, P2: s2.P2},

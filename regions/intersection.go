@@ -26,7 +26,7 @@ func (r Region) IntersectionPoints(o Region) mapset.Set[geometry.Point] {
 	intersections := mapset.NewSet[geometry.Point]()
 	for _, rs := range r.Sides() {
 		for _, os := range o.Sides() {
-			if inter, err := geometry.Intersection(rs, os); err == nil {
+			if inter, ok := geometry.Intersection(rs, os).(geometry.Point); ok {
 				intersections.Add(inter)
 			}
 		}
@@ -55,7 +55,7 @@ func (r Region) Contains(p geometry.Point) bool {
 	}
 	var counter uint = 0
 	for _, s := range r.Sides() {
-		if inter, err := geometry.Intersection(line, s); err == nil {
+		if inter, ok := geometry.Intersection(line, s).(geometry.Point); ok {
 			if inter != s.P1 && inter != s.P2 {
 				counter++
 			} else {

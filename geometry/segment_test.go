@@ -5,32 +5,27 @@ import "testing"
 func TestIntersectionOdd(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{5, 5}}
 	segment2 := Segment{Point{0, 5}, Point{5, 0}}
-	intersection, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
-	}
-	if intersection != (Point{2.5, 2.5}) {
-		t.Errorf("expected %v, actual %v", Point{2, 2}, intersection)
+	intersection := Intersection(segment1, segment2)
+	expected := Point{2.5, 2.5}
+	if intersection != expected {
+		t.Fatalf("expected %v, actual %v", expected, intersection)
 	}
 }
 
 func TestIntersectionEven(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{4, 4}}
 	segment2 := Segment{Point{0, 4}, Point{4, 0}}
-	intersection, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
-	}
+	intersection := Intersection(segment1, segment2)
 	if intersection != (Point{2, 2}) {
-		t.Errorf("expected %v, actual %v", Point{2, 2}, intersection)
+		t.Fatalf("expected %v, actual %v", Point{2, 2}, intersection)
 	}
 }
 
 func TestIntersectionNot(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{5, 0}}
 	segment2 := Segment{Point{0, 5}, Point{5, 5}}
-	_, err := Intersection(segment1, segment2)
-	if err == nil {
+	inter := Intersection(segment1, segment2)
+	if inter != nil {
 		t.Fail()
 	}
 }
@@ -38,10 +33,7 @@ func TestIntersectionNot(t *testing.T) {
 func TestIntersectionEnd(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{5, 0}}
 	segment2 := Segment{Point{0, 5}, Point{5, 0}}
-	intersection, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
-	}
+	intersection := Intersection(segment1, segment2)
 	if intersection != (Point{5, 0}) {
 		t.Fail()
 	}
@@ -50,53 +42,47 @@ func TestIntersectionEnd(t *testing.T) {
 func TestIntersection(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{1, 0}}
 	segment2 := Segment{Point{1, 1}, Point{0, 1}}
-	if _, err := Intersection(segment1, segment2); err == nil {
+	if inter := Intersection(segment1, segment2); inter != nil {
 		t.Fail()
 	}
-
 }
 
 func TestIntersectionHorizontalParallel(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{10, 0}}
 	segment2 := Segment{Point{0, 0}, Point{20, 0}}
-	_, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
+	if inter := Intersection(segment1, segment2); inter != segment1 {
+		t.Fatal(inter)
 	}
 }
 
 func TestIntersectionVerticalParallel(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{0, 10}}
 	segment2 := Segment{Point{0, 0}, Point{0, 20}}
-	_, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
+	if inter := Intersection(segment1, segment2); inter != segment1 {
+		t.Fatal(inter)
 	}
 }
 
 func TestIntersectionParallel(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{5, 5}}
 	segment2 := Segment{Point{2, 2}, Point{20, 20}}
-	_, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Error(err)
+	if inter := Intersection(segment1, segment2); inter != (Segment{Point{5, 5}, Point{2, 2}}) {
+		t.Fatal(inter)
 	}
 }
 
 func TestIntersectionParallelNotIntersect(t *testing.T) {
 	segment1 := Segment{Point{0, 0}, Point{3, 0}}
 	segment2 := Segment{Point{4, 0}, Point{20, 0}}
-	_, err := Intersection(segment1, segment2)
-	if err == nil {
-		t.Fatal()
+	if inter := Intersection(segment1, segment2); inter != nil {
+		t.Fatal(inter)
 	}
 }
 
 func TestIntersectionParallelNotIntersect2(t *testing.T) {
 	segment2 := Segment{Point{0, 0}, Point{3, 0}}
 	segment1 := Segment{Point{4, 0}, Point{20, 0}}
-	_, err := Intersection(segment1, segment2)
-	if err == nil {
+	if inter := Intersection(segment1, segment2); inter != nil {
 		t.Fatal()
 	}
 }
@@ -104,25 +90,44 @@ func TestIntersectionParallelNotIntersect2(t *testing.T) {
 func TestIntersection2(t *testing.T) {
 	segment1 := Segment{Point{2, 0}, Point{1, 0}}
 	segment2 := Segment{Point{1, 0}, Point{0, 0}}
-	inter, err := Intersection(segment1, segment2)
-	if err != nil {
-		t.Fatal(err)
-	}
-	actual := Point{1, 0}
-	if inter != actual {
-		t.Fatal()
+	inter := Intersection(segment1, segment2)
+	if inter != (Point{1, 0}) {
+		t.Fatal(inter)
 	}
 }
 
 func TestIntersectionParallelButNotIntersecting(t *testing.T) {
 	s1 := Segment{P1: Point{X: 31, Y: 4}, P2: Point{X: 31, Y: 5}}
 	s2 := Segment{P1: Point{X: 31, Y: 7}, P2: Point{X: 31, Y: 8}}
-	inter, err := Intersection(s1, s2)
-	if err == nil {
+	inter := Intersection(s1, s2)
+	if inter != nil {
 		t.Fatal(inter)
 	}
 }
 
+func TestIntersectionParallelEnd(t *testing.T) {
+	s1 := Segment{P1: Point{X: 0, Y: 0}, P2: Point{X: 10, Y: 0}}
+	s2 := Segment{P1: Point{X: 9, Y: 0}, P2: Point{X: 10, Y: 0}}
+	if inter := Intersection(s1, s2); inter != (Segment{P1: Point{X: 10, Y: 0}, P2: Point{X: 9, Y: 0}}) {
+		t.Fatal(inter)
+	}
+}
+
+func TestIntersectionParallelEnd2(t *testing.T) {
+	s1 := Segment{P1: Point{X: 0, Y: 0}, P2: Point{X: 9, Y: 0}}
+	s2 := Segment{P1: Point{X: 9, Y: 0}, P2: Point{X: 10, Y: 0}}
+	if inter := Intersection(s1, s2); inter != (Point{9, 0}) {
+		t.Fatal(inter)
+	}
+}
+
+func TestIntersectionParallelEnd3(t *testing.T) {
+	s1 := Segment{P1: Point{X: 0, Y: 0}, P2: Point{X: 10, Y: 0}}
+	s2 := Segment{P1: Point{X: 0, Y: 0}, P2: Point{X: 10, Y: 0}}
+	if inter := Intersection(s1, s2); inter != s1 {
+		t.Fatal(inter)
+	}
+}
 
 func TestIsParallelToDiagonal(t *testing.T) {
 	segment1 := Segment{Point{1, 1}, Point{2, 2}}
