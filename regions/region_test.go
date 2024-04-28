@@ -165,7 +165,7 @@ func TestIntersectSegments(t *testing.T) {
 	}
 	expected := mapset.NewSet(
 		geometry.Segment{P1: geometry.Point{X: 0, Y: 0}, P2: geometry.Point{X: 9, Y: 0}},
-		geometry.Segment{P1: geometry.Point{X: 9, Y: 0}, P2: geometry.Point{X: 10, Y: 0}},
+		geometry.Segment{P1: geometry.Point{X: 10, Y: 0}, P2: geometry.Point{X: 9, Y: 0}},
 	)
 	actual := mapset.NewSet(intersectSegments(segments)...)
 	if !expected.Equal(actual) {
