@@ -36,7 +36,7 @@ func (r Region) IntersectionPoints(o Region) mapset.Set[geometry.Point] {
 
 func (r Region) Contains(p geometry.Point) bool {
 	/*
-	The issue is solved as follows: If the intersection point is a vertex of a tested polygon side, then the intersection counts only if the other vertex of the side lies below the ray. This is effectively equivalent to considering vertices on the ray as lying slightly above the ray.
+		The issue is solved as follows: If the intersection point is a vertex of a tested polygon side, then the intersection counts only if the other vertex of the side lies below the ray. This is effectively equivalent to considering vertices on the ray as lying slightly above the ray.
 	*/
 	for _, side := range r.Sides() {
 		if side.Contains(p) {

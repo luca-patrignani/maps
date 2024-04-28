@@ -132,7 +132,7 @@ func intersectSegments(segments []geometry.Segment) []geometry.Segment {
 					edges.Remove(si)
 					edges.Remove(sj)
 					edges.Add(inter)
-					points := []geometry.Point{si.P1, si.P2, sj.P1, sj.P2}					
+					points := []geometry.Point{si.P1, si.P2, sj.P1, sj.P2}
 					for _, p := range points {
 						if p != inter.P1 && p != inter.P2 {
 							if p.Distance(inter.P1) < p.Distance(inter.P2) {

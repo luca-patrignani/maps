@@ -2,46 +2,125 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
-	"os"
+	"image"
+	"image/color"
+	"log"
 
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/island"
 	"github.com/luca-patrignani/maps/regions"
 	"github.com/spf13/afero"
-	"github.com/veandco/go-sdl2/gfx"
-	"github.com/veandco/go-sdl2/sdl"
 )
 
+const (
+	screenWidth  = 640
+	screenHeight = 480
+)
+
+var (
+	whiteImage = ebiten.NewImage(3, 3)
+)
+
+func init() {
+	whiteImage.Fill(color.White)
+}
+
+type Game struct {
+	ir         island.IslandRepository
+	nations    []regions.Region
+	drawNation bool
+	rb         regions.RegionBuilder
+	scale      float32
+}
+
+func (g *Game) Update() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeyN) {
+		g.drawNation = !g.drawNation
+		if g.drawNation {
+			fmt.Println("Draw nation mode")
+		} else {
+			fmt.Println("Normal mode")
+		}
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
+		x, y := ebiten.CursorPosition()
+		g.rb.AddPoint(geometry.Point{
+			X: float64(x / int(g.scale)),
+			Y: float64(y / int(g.scale)),
+		})
+	} else {
+		if region, err := g.rb.Build(); err == nil {
+			if g.drawNation {
+				for _, island := range g.ir.Islands() {
+					if nation, err := region.Intersection(island.Region); err == nil {
+						g.nations = append(g.nations, nation)
+						break
+					}
+				}
+				fmt.Println(g.nations)
+			} else {
+				intersect := false
+				for _, island := range g.ir.Islands() {
+					if _, err := island.Region.Intersection(region); err == nil {
+						intersect = true
+						break
+					}
+				}
+				if !intersect {
+					g.ir.Save(island.Island{Name: "1", Region: region})
+				}
+			}
+		}
+		g.rb = regions.RegionBuilder{}
+	}
+	return nil
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+	for _, island := range g.ir.Islands() {
+		g.drawRegion(screen, island.Region, color.RGBA64{R: 255, G: 0, B: 0, A: 255})
+	}
+	for _, s := range g.rb.Segments {
+		vector.StrokeLine(screen,
+			float32(s.P1.X)*g.scale, float32(s.P1.Y)*g.scale, float32(s.P2.X)*g.scale, float32(s.P2.Y)*g.scale,
+			g.scale, color.White, false)
+	}
+}
+
+func (game *Game) drawRegion(screen *ebiten.Image, region regions.Region, color color.Color) {
+	op := &ebiten.DrawTrianglesOptions{}
+	op.Address = ebiten.AddressUnsafe
+	indices := []uint16{}
+	for i := 0; i < len(region); i++ {
+		indices = append(indices, uint16(i), uint16(i+1)%uint16(len(region)), uint16(len(region)-1))
+	}
+	r, g, b, a := color.RGBA()
+	vertices := []ebiten.Vertex{}
+	for _, point := range region {
+		vertices = append(vertices, ebiten.Vertex{
+			DstX:   float32(point.X) * game.scale,
+			DstY:   float32(point.Y) * game.scale,
+			ColorR: float32(r),
+			ColorG: float32(g),
+			ColorB: float32(b),
+			ColorA: float32(a),
+		})
+	}
+	screen.DrawTriangles(vertices, indices, whiteImage.SubImage(image.Rect(1, 1, 2, 2)).(*ebiten.Image), op)
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	return outsideWidth, outsideHeight
+}
+
 func main() {
-	window, err := sdl.CreateWindow("test", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, 800, 600, sdl.WINDOW_RESIZABLE)
-
-	if err != nil {
-		panic(err)
-	}
-	defer window.Destroy()
-
-	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		panic(err)
-	}
-	defer renderer.Destroy()
-
-	renderer.SetDrawColor(0, 255, 0, 255)
-	renderer.FillRect(&sdl.Rect{
-		X: 10,
-		Y: 10,
-		W: 100,
-		H: 100,
-	})
-	var scale int32 = 5
-	renderer.SetScale(float32(scale), float32(scale))
-	rb := regions.RegionBuilder{}
-	if err := os.MkdirAll("./maps", fs.ModePerm); err != nil {
-		panic(err)
-	}
-	var ir island.IslandRepository
-	ir, err = island.NewIslandRepository(afero.NewBasePathFs(afero.OsFs{}, "./maps"), "test.json")
+	ebiten.SetWindowSize(screenWidth, screenHeight)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowTitle("maps")
+	ir, err := island.NewIslandRepository(afero.NewBasePathFs(afero.OsFs{}, "./maps"), "test.json")
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("creating a new repository from scratch")
@@ -50,92 +129,7 @@ func main() {
 			panic(err)
 		}
 	}
-	nations := []regions.Region{}
-
-	running := true
-	pressed := false
-	drawNation := false
-	for running {
-		renderer.SetDrawColor(0, 0, 0, 255)
-		renderer.Clear()
-
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch t := event.(type) {
-			case *sdl.QuitEvent:
-				running = false
-			case *sdl.MouseMotionEvent:
-				if pressed {
-					newPoint := geometry.Point{
-						X: float64(t.X / int32(scale)),
-						Y: float64(t.Y / int32(scale)),
-					}
-					rb.AddPoint(newPoint)
-				}
-			case *sdl.MouseButtonEvent:
-				if t.State == sdl.PRESSED {
-					pressed = true
-				} else {
-					pressed = false
-					if region, err := rb.Build(); err == nil {
-						if drawNation {
-							for _, island := range ir.Islands() {
-								if nation, err := region.Intersection(island.Region); err == nil {
-									nations = append(nations, nation)
-									break
-								}
-							}
-							fmt.Println(nations)
-						} else {
-							intersect := false
-							for _, island := range ir.Islands() {
-								if _, err := island.Region.Intersection(region); err == nil {
-									intersect = true
-									break
-								}
-							}
-							if !intersect {
-								ir.Save(island.Island{Name: "1", Region: region})
-							}
-						}
-					}
-					rb = regions.RegionBuilder{}
-				}
-			case *sdl.KeyboardEvent:
-				if t.Keysym.Sym == sdl.K_n && t.Type == sdl.KEYUP {
-					drawNation = !drawNation
-					if drawNation {
-						fmt.Println("Draw nation mode")
-					} else {
-						fmt.Println("Normal mode")
-					}
-				}
-			}
-		}
-		for _, island := range ir.Islands() {
-			drawRegion(renderer, island.Region, sdl.Color{R: 255, G: 0, B: 0, A: 255})
-		}
-		for _, nation := range nations {
-			drawRegion(renderer, nation, sdl.Color{R: 0, G: 0, B: 255, A: 255})
-		}
-		renderer.SetDrawColor(0, 255, 0, 255)
-		for _, segment := range rb.Segments {
-			renderer.DrawLine(int32(segment.P1.X), int32(segment.P1.Y), int32(segment.P2.X), int32(segment.P2.Y))
-		}
-		renderer.Present()
+	if err := ebiten.RunGame(&Game{ir: ir, scale: 10}); err != nil {
+		log.Fatal(err)
 	}
-}
-
-func drawRegion(renderer *sdl.Renderer, region regions.Region, color sdl.Color) {
-	vx := []int16{}
-	vy := []int16{}
-	for _, point := range region {
-		vx = append(vx, int16(point.X))
-		vy = append(vy, int16(point.Y))
-	}
-	gfx.FilledPolygonColor(
-		renderer,
-		vx,
-		vy,
-		color,
-	)
 }

@@ -10,7 +10,7 @@ type Segment struct {
 }
 
 // it can be nil, a Point or a Segment
-type intersectionResult interface {}
+type intersectionResult interface{}
 
 func Intersection(s1, s2 Segment) intersectionResult {
 	x1 := s1.P1.X
