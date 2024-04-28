@@ -70,7 +70,9 @@ func (g *Game) Update() error {
 					}
 				}
 				if !intersect {
-					g.ir.Save(island.Island{Name: "1", Region: region})
+					if _, err := g.ir.Save(island.Island{Name: "1", Region: region}); err != nil {
+						fmt.Println(err)
+					}
 				}
 			}
 		}
