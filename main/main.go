@@ -34,6 +34,8 @@ type Game struct {
 	drawNation bool
 	rb         regions.RegionBuilder
 	scale      float32
+	posX int
+	posY int
 }
 
 func (g *Game) Update() error {
@@ -48,8 +50,8 @@ func (g *Game) Update() error {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
 		g.rb.AddPoint(geometry.Point{
-			X: float64(x / int(g.scale)),
-			Y: float64(y / int(g.scale)),
+			X: float64(x / int(g.scale)) + float64(g.posX),
+			Y: float64(y / int(g.scale)) + float64(g.posY),
 		})
 	} else {
 		if region, err := g.rb.Build(); err == nil {
@@ -78,6 +80,18 @@ func (g *Game) Update() error {
 		}
 		g.rb = regions.RegionBuilder{}
 	}
+	_, dyWheel := ebiten.Wheel()
+	if dyWheel != 0 {
+		g.scale += float32(dyWheel)
+		if g.scale <= 0 {
+			g.scale = 1
+		}
+		x, y := ebiten.CursorPosition()
+		g.posX = (x/int(g.scale) + 2*g.posX)
+		g.posY = (y/int(g.scale) + 2*g.posY)
+		fmt.Println(dyWheel)
+	}
+
 	return nil
 }
 
@@ -87,9 +101,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	for _, s := range g.rb.Segments {
 		vector.StrokeLine(screen,
-			float32(s.P1.X)*g.scale, float32(s.P1.Y)*g.scale, float32(s.P2.X)*g.scale, float32(s.P2.Y)*g.scale,
+			float32(s.P1.X - float64(g.posX))*g.scale, 
+			float32(s.P1.Y - float64(g.posY))*g.scale, 
+			float32(s.P2.X - float64(g.posX))*g.scale, 
+			float32(s.P2.Y - float64(g.posY))*g.scale,
 			g.scale, color.White, false)
 	}
+	vector.StrokeCircle(screen, float32(g.posX), float32(g.posY), 10, 1, color.White, false)
 }
 
 func (game *Game) drawRegion(screen *ebiten.Image, region regions.Region, color color.Color) {
@@ -103,8 +121,8 @@ func (game *Game) drawRegion(screen *ebiten.Image, region regions.Region, color 
 	vertices := []ebiten.Vertex{}
 	for _, point := range region {
 		vertices = append(vertices, ebiten.Vertex{
-			DstX:   float32(point.X) * game.scale,
-			DstY:   float32(point.Y) * game.scale,
+			DstX:   float32(point.X - float64(game.posX)) * game.scale,
+			DstY:   float32(point.Y - float64(game.posY)) * game.scale,
 			ColorR: float32(r),
 			ColorG: float32(g),
 			ColorB: float32(b),
@@ -131,7 +149,7 @@ func main() {
 			panic(err)
 		}
 	}
-	if err := ebiten.RunGame(&Game{ir: ir, scale: 10}); err != nil {
+	if err := ebiten.RunGame(&Game{ir: ir, scale: 10, posX: screenWidth/2, posY: screenHeight/2}); err != nil {
 		log.Fatal(err)
 	}
 }
