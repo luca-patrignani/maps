@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/luca-patrignani/maps/bresenham"
 	"github.com/luca-patrignani/maps/geometry"
+	"github.com/luca-patrignani/maps/morphology"
 )
 
 var (
@@ -18,29 +19,26 @@ func init() {
 	whiteImage.Fill(color.White)
 }
 
-const (
-	sea  = 0
-	land = 1
-	lake = 2
-)
-
 type Game struct {
-	morph        map[geometry.Point]int
+	morph        morphology.Morphology
 	pendingPoint *geometry.Point
 }
 
 func (g *Game) Update() error {
+	x, y := ebiten.CursorPosition()
+	p := geometry.Point{X: x, Y: y}
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
-		x, y := ebiten.CursorPosition()
-		p := geometry.Point{X: x, Y: y}
 		if g.pendingPoint != nil {
-			for _, pp := range bresenham.Bresenham(*g.pendingPoint, p) {
-				g.morph[pp] = land
-			}
+			g.morph.DrawLine(p, *g.pendingPoint, morphology.Land)
 		}
 		g.pendingPoint = &p
 	} else {
 		g.pendingPoint = nil
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButton2) {
+		if g.morph.FillWith(p, morphology.Land, morphology.Sea) {
+			fmt.Println("fill")
+		}
 	}
 	return nil
 }
@@ -48,9 +46,9 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 255, 255})
 	w, h := ebiten.WindowSize()
-	for p, t := range g.morph {
+	for p, t := range g.morph.Data {
 		if p.X < w && p.Y < h {
-			if t == land {
+			if t == morphology.Land {
 				vector.StrokeRect(screen, float32(p.X), float32(p.Y), 1, 1, 1, color.RGBA{255, 0, 0, 255}, true)
 			}
 		}
@@ -63,7 +61,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	if err := ebiten.RunGame(&Game{morph: make(map[geometry.Point]int)}); err != nil {
+	if err := ebiten.RunGame(&Game{morph: morphology.New(0, 0, 2000, 2000)}); err != nil {
 		log.Fatal(err)
 	}
 }
