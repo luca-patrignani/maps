@@ -10,11 +10,6 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 )
 
-const (
-	screenWidth  = 640
-	screenHeight = 480
-)
-
 var (
 	whiteImage = ebiten.NewImage(3, 3)
 )
@@ -53,20 +48,21 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 255, 255})
 	w, h := ebiten.WindowSize()
-	for i := 0; i < w; i++ {
-		for j := 0; j < h; j++ {
-			if g.morph[(geometry.Point{X: i, Y: j})] == land {
-				vector.StrokeRect(screen, float32(i), float32(j), 1, 1, 1, color.RGBA{255, 0, 0, 255}, true)
+	for p, t := range g.morph {
+		if p.X < w && p.Y < h {
+			if t == land {
+				vector.StrokeRect(screen, float32(p.X), float32(p.Y), 1, 1, 1, color.RGBA{255, 0, 0, 255}, true)
 			}
 		}
 	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return screenWidth, screenHeight
+	return outsideWidth, outsideHeight
 }
 
 func main() {
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	if err := ebiten.RunGame(&Game{morph: make(map[geometry.Point]int)}); err != nil {
 		log.Fatal(err)
 	}
