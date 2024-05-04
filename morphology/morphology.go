@@ -5,21 +5,21 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 )
 
-type morphType int
+type MorphType int
 
 const (
-	Sea  morphType = 0
-	Land morphType = 1
+	Sea  MorphType = 0
+	Land MorphType = 1
 )
 
 type Morphology struct {
-	Data                   map[geometry.Point]morphType
+	Data                   map[geometry.Point]MorphType
 	MinX, MinY, MaxX, MaxY int
 }
 
 func New(minX, minY, maxX, maxY int) Morphology {
 	return Morphology{
-		Data: map[geometry.Point]morphType{},
+		Data: map[geometry.Point]MorphType{},
 		MinX: minX,
 		MinY: minY,
 		MaxX: maxX,
@@ -27,7 +27,7 @@ func New(minX, minY, maxX, maxY int) Morphology {
 	}
 }
 
-func (m Morphology) FillWith(p geometry.Point, foreground, background morphType) bool {
+func (m Morphology) FillWith(p geometry.Point, foreground, background MorphType) bool {
 	if m.Data[p] != background {
 		return false
 	}
@@ -45,7 +45,7 @@ func (m Morphology) FillWith(p geometry.Point, foreground, background morphType)
 	return true
 }
 
-func (m Morphology) DrawLine(p1, p2 geometry.Point, t morphType) {
+func (m Morphology) DrawLine(p1, p2 geometry.Point, t MorphType) {
 	for _, pp := range bresenham.Bresenham(p1, p2) {
 		m.Data[pp] = t
 	}

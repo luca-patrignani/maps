@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
@@ -22,6 +23,7 @@ func init() {
 type Game struct {
 	morph        morphology.Morphology
 	pendingPoint *geometry.Point
+	fore, back morphology.MorphType
 }
 
 func (g *Game) Update() error {
@@ -29,16 +31,19 @@ func (g *Game) Update() error {
 	p := geometry.Point{X: x, Y: y}
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		if g.pendingPoint != nil {
-			g.morph.DrawLine(p, *g.pendingPoint, morphology.Land)
+			g.morph.DrawLine(p, *g.pendingPoint, g.fore)
 		}
 		g.pendingPoint = &p
 	} else {
 		g.pendingPoint = nil
 	}
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton2) {
-		if g.morph.FillWith(p, morphology.Land, morphology.Sea) {
+		if g.morph.FillWith(p, g.fore, g.back) {
 			fmt.Println("fill")
 		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+		g.fore, g.back = g.back, g.fore
 	}
 	return nil
 }
@@ -61,7 +66,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	if err := ebiten.RunGame(&Game{morph: morphology.New(0, 0, 2000, 2000)}); err != nil {
+	if err := ebiten.RunGame(&Game{morph: morphology.New(0, 0, 2000, 2000), fore: morphology.Land, back: morphology.Sea}); err != nil {
 		log.Fatal(err)
 	}
 }
