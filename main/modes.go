@@ -28,10 +28,22 @@ func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 type State struct {
-	Morph            *morphology.Morphology
-	PendingPoint     *geometry.Point
-	Fore, Back       morphology.MorphType
-	RubberSize int
+	Morph        *morphology.Morphology
+	PendingPoint *geometry.Point
+	Fore, Back   morphology.MorphType
+	RubberSize   int
+	ViewScale    int
+	ViewOrigin   geometry.Point
+}
+
+// model -> view
+func (s State) Scaled(p geometry.Point) geometry.Point {
+	return geometry.Point{X: (p.X - s.ViewOrigin.X) * s.ViewScale, Y: (p.Y - s.ViewOrigin.Y) * s.ViewScale}
+}
+
+// view -> model
+func (s State) Unscaled(p geometry.Point) geometry.Point {
+	return geometry.Point{X: p.X/s.ViewScale + s.ViewOrigin.X, Y: p.Y/s.ViewScale + s.ViewOrigin.Y}
 }
 
 type NormalMode struct {
@@ -49,7 +61,9 @@ var normalMode NormalMode = NormalMode{State: &State{
 	PendingPoint: &geometry.Point{},
 	Fore:         morphology.Land,
 	Back:         morphology.Sea,
-	RubberSize:      40,
+	RubberSize:   40,
+	ViewScale:    1,
+	ViewOrigin:   geometry.Point{X: 0, Y: 0},
 }}
 
 var drawModePencil DrawModePencil = DrawModePencil(normalMode)
@@ -61,6 +75,11 @@ var drawModeFill DrawModeFill = DrawModeFill(normalMode)
 var Game gameWrapper = gameWrapper{Wrapped: &normalMode}
 
 func (g *NormalMode) Update() error {
+	_, wheelDy := ebiten.Wheel()
+	g.ViewScale += int(wheelDy)
+	if g.ViewScale < 1 {
+		g.ViewScale = 1
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
 		Game.Wrapped = &drawModePencil
 		fmt.Println("Entering draw mode")
@@ -71,10 +90,15 @@ func (g *NormalMode) Update() error {
 func (g *NormalMode) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 255, 255})
 	w, h := ebiten.WindowSize()
-	for p, t := range g.Morph.Data {
+	rect := ebiten.NewImage(g.ViewScale, g.ViewScale)
+	for pp, t := range g.Morph.Data {
+		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
 			if t == morphology.Land {
-				vector.StrokeRect(screen, float32(p.X), float32(p.Y), 1, 1, 1, color.RGBA{255, 0, 0, 255}, true)
+				rect.Fill(color.RGBA{255, 0, 0, 255})
+				geoM := ebiten.GeoM{}
+				geoM.Translate(float64(p.X), float64(p.Y))
+				screen.DrawImage(rect, &ebiten.DrawImageOptions{GeoM: geoM})
 			}
 		}
 	}
@@ -90,7 +114,7 @@ type DrawModePencil struct {
 
 func (g *DrawModePencil) Update() error {
 	x, y := ebiten.CursorPosition()
-	p := geometry.Point{X: x, Y: y}
+	p := g.Unscaled(geometry.Point{X: x, Y: y})
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		if g.PendingPoint != nil {
 			g.Morph.DrawLine(p, *g.PendingPoint, g.Fore)
@@ -128,11 +152,12 @@ type DrawModeRubber struct {
 }
 
 func (g *DrawModeRubber) Update() error {
-	x, y := ebiten.CursorPosition()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
+		x, y := ebiten.CursorPosition()
+		p := g.Unscaled(geometry.Point{X: x, Y: y})
 		r := geometry.Point{}
-		for r.X = x; r.X <= x+g.RubberSize; r.X++ {
-			for r.Y = y; r.Y <= y+g.RubberSize; r.Y++ {
+		for r.X = p.X; r.X <= p.X+g.RubberSize; r.X++ {
+			for r.Y = p.Y; r.Y <= p.Y+g.RubberSize; r.Y++ {
 				g.Morph.Data[r] = g.Fore
 			}
 		}
@@ -149,7 +174,8 @@ func (g *DrawModeRubber) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	x, y := ebiten.CursorPosition()
-	vector.StrokeRect(screen, float32(x), float32(y), float32(g.RubberSize), float32(g.RubberSize), 1, color.Black, true)
+	p := g.Scaled(geometry.Point{X: x, Y: y})
+	vector.StrokeRect(screen, float32(p.X), float32(p.Y), float32(g.RubberSize), float32(g.RubberSize), 1, color.Black, true)
 }
 
 func (g *DrawModeRubber) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -163,7 +189,7 @@ type DrawModeFill struct {
 func (g *DrawModeFill) Update() error {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
-		p := geometry.Point{X: x, Y: y}
+		p := g.Unscaled(geometry.Point{X: x, Y: y})
 		g.Morph.FillWith(p, g.Fore, g.Back)
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
