@@ -146,6 +146,9 @@ func (g *DrawModeRubber) Update() error {
 
 func (g *DrawModeRubber) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
+	x, y := ebiten.CursorPosition()
+	vector.StrokeRect(screen, float32(x), float32(y), float32(g.RubberW), float32(g.RubberH), 1, color.Black, true)
 }
 
 func (g *DrawModeRubber) Layout(outsideWidth, outsideHeight int) (int, int) {
