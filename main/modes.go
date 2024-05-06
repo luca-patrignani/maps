@@ -80,6 +80,11 @@ func (g *NormalMode) Update() error {
 	if g.ViewScale < 1 {
 		g.ViewScale = 1
 	}
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0) {
+		x, y := ebiten.CursorPosition()
+		w, h := g.Layout(ebiten.WindowSize())
+		g.ViewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
 		Game.Wrapped = &drawModePencil
 		fmt.Println("Entering draw mode")
