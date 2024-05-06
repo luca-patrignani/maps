@@ -169,6 +169,9 @@ func (g *DrawModeRubber) Update() error {
 	}
 	_, wheelDy := ebiten.Wheel()
 	g.RubberSize += int(wheelDy)
+	if g.RubberSize < 1 {
+		g.RubberSize = 1
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		Game.Wrapped = &drawModePencil
 	}
@@ -179,8 +182,8 @@ func (g *DrawModeRubber) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	x, y := ebiten.CursorPosition()
-	p := g.Scaled(geometry.Point{X: x, Y: y})
-	vector.StrokeRect(screen, float32(p.X), float32(p.Y), float32(g.RubberSize), float32(g.RubberSize), 1, color.Black, true)
+	vector.StrokeRect(screen, float32(x), float32(y), float32(g.RubberSize*g.ViewScale), float32(g.RubberSize*g.ViewScale), float32(g.ViewScale), color.Black, true)
+	ebiten.SetCursorMode(ebiten.CursorModeVisible)
 }
 
 func (g *DrawModeRubber) Layout(outsideWidth, outsideHeight int) (int, int) {
