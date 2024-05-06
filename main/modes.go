@@ -31,7 +31,7 @@ type State struct {
 	Morph            *morphology.Morphology
 	PendingPoint     *geometry.Point
 	Fore, Back       morphology.MorphType
-	RubberW, RubberH int
+	RubberSize int
 }
 
 type NormalMode struct {
@@ -49,8 +49,7 @@ var normalMode NormalMode = NormalMode{State: &State{
 	PendingPoint: &geometry.Point{},
 	Fore:         morphology.Land,
 	Back:         morphology.Sea,
-	RubberW:      100,
-	RubberH:      100,
+	RubberSize:      40,
 }}
 
 var drawModePencil DrawModePencil = DrawModePencil(normalMode)
@@ -132,12 +131,14 @@ func (g *DrawModeRubber) Update() error {
 	x, y := ebiten.CursorPosition()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		r := geometry.Point{}
-		for r.X = x; r.X <= x+g.RubberW; r.X++ {
-			for r.Y = y; r.Y <= y+g.RubberH; r.Y++ {
+		for r.X = x; r.X <= x+g.RubberSize; r.X++ {
+			for r.Y = y; r.Y <= y+g.RubberSize; r.Y++ {
 				g.Morph.Data[r] = g.Fore
 			}
 		}
 	}
+	_, wheelDy := ebiten.Wheel()
+	g.RubberSize += int(wheelDy)
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		Game.Wrapped = &drawModePencil
 	}
@@ -148,7 +149,7 @@ func (g *DrawModeRubber) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	x, y := ebiten.CursorPosition()
-	vector.StrokeRect(screen, float32(x), float32(y), float32(g.RubberW), float32(g.RubberH), 1, color.Black, true)
+	vector.StrokeRect(screen, float32(x), float32(y), float32(g.RubberSize), float32(g.RubberSize), 1, color.Black, true)
 }
 
 func (g *DrawModeRubber) Layout(outsideWidth, outsideHeight int) (int, int) {
