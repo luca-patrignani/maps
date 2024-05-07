@@ -29,13 +29,13 @@ func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 type State struct {
-	Morph        *morphology.Morphology
+	Morph         *morphology.Morphology
 	MorphFilename string
-	PendingPoint *geometry.Point
-	Fore, Back   morphology.MorphType
-	RubberSize   int
-	ViewScale    int
-	ViewOrigin   geometry.Point
+	PendingPoint  *geometry.Point
+	Fore, Back    morphology.MorphType
+	RubberSize    int
+	ViewScale     int
+	ViewOrigin    geometry.Point
 }
 
 // model -> view
@@ -60,12 +60,12 @@ var normalMode NormalMode = NormalMode{State: &State{
 		MaxX: 2000,
 		MaxY: 2000,
 	},
-	PendingPoint: &geometry.Point{},
-	Fore:         morphology.Land,
-	Back:         morphology.Sea,
-	RubberSize:   40,
-	ViewScale:    1,
-	ViewOrigin:   geometry.Point{X: 0, Y: 0},
+	PendingPoint:  &geometry.Point{},
+	Fore:          morphology.Land,
+	Back:          morphology.Sea,
+	RubberSize:    40,
+	ViewScale:     1,
+	ViewOrigin:    geometry.Point{X: 0, Y: 0},
 	MorphFilename: "morphology.json",
 }}
 
@@ -94,7 +94,9 @@ func (g *NormalMode) Update() error {
 			fmt.Println(err)
 			return err
 		}
-		g.Morph.Save(f)
+		if err := g.Morph.Save(f); err != nil {
+			return err
+		}
 		if err := f.Close(); err != nil {
 			return err
 		}
