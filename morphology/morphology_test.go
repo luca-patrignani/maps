@@ -1,6 +1,8 @@
 package morphology
 
 import (
+	"bytes"
+	"reflect"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set/v2"
@@ -63,5 +65,24 @@ func TestFillWith(t *testing.T) {
 	}
 	if !expected.Equal(actual) {
 		t.Fatal(expected, actual)
+	}
+}
+
+func TestLoadSave(t *testing.T) {
+	m1 := New(0, 0, 2000, 2000)
+	m1.DrawLine(geometry.Point{X: 0, Y: 0}, geometry.Point{X: 5, Y: 0}, Land)
+	m1.DrawLine(geometry.Point{X: 5, Y: 0}, geometry.Point{X: 5, Y: 5}, Land)
+	m1.DrawLine(geometry.Point{X: 5, Y: 5}, geometry.Point{X: 0, Y: 5}, Land)
+	m1.DrawLine(geometry.Point{X: 0, Y: 5}, geometry.Point{X: 0, Y: 0}, Land)
+	rw := bytes.Buffer{}
+	if err := m1.Save(&rw); err != nil {
+		t.Fatal(err)
+	}
+	m2, err := NewFromFile(&rw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(m1, m2) {
+		t.Fatal()
 	}
 }

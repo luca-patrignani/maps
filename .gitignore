@@ -21,6 +21,6 @@ app
 # Go workspace file
 go.work
 
-maps/
+morphology.json
 
 main/main

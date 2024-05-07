@@ -1,6 +1,9 @@
 package morphology
 
 import (
+	"encoding/json"
+	"io"
+
 	"github.com/luca-patrignani/maps/bresenham"
 	"github.com/luca-patrignani/maps/geometry"
 )
@@ -49,4 +52,23 @@ func (m Morphology) DrawLine(p1, p2 geometry.Point, t MorphType) {
 	for _, pp := range bresenham.Bresenham(p1, p2) {
 		m.Data[pp] = t
 	}
+}
+
+func (m Morphology) Save(w io.Writer) error {
+	j, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(j)
+	return err
+}
+
+func NewFromFile(r io.Reader) (Morphology, error) {
+	j, err := io.ReadAll(r)
+	if err != nil {
+		return Morphology{}, err
+	}
+	m := Morphology{}
+	err = json.Unmarshal(j, &m)
+	return m, err
 }

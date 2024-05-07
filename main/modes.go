@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -29,6 +30,7 @@ func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 type State struct {
 	Morph        *morphology.Morphology
+	MorphFilename string
 	PendingPoint *geometry.Point
 	Fore, Back   morphology.MorphType
 	RubberSize   int
@@ -64,6 +66,7 @@ var normalMode NormalMode = NormalMode{State: &State{
 	RubberSize:   40,
 	ViewScale:    1,
 	ViewOrigin:   geometry.Point{X: 0, Y: 0},
+	MorphFilename: "morphology.json",
 }}
 
 var drawModePencil DrawModePencil = DrawModePencil(normalMode)
@@ -85,6 +88,32 @@ func (g *NormalMode) Update() error {
 		w, h := g.Layout(ebiten.WindowSize())
 		g.ViewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		f, err := os.Create(g.MorphFilename)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		g.Morph.Save(f)
+		if err := f.Close(); err != nil {
+			return err
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyL) {
+		f, err := os.Open(g.MorphFilename)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		*g.Morph, err = morphology.NewFromFile(f)
+		if err != nil {
+			return err
+		}
+		if err := f.Close(); err != nil {
+			return err
+		}
+	}
+
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
 		Game.Wrapped = &drawModePencil
 		fmt.Println("Entering draw mode")
