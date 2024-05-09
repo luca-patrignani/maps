@@ -6,11 +6,11 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 )
 
-type DrawModeFill struct {
+type DrawFillMode struct {
 	*State
 }
 
-func (g *DrawModeFill) Update() error {
+func (g *DrawFillMode) Update() error {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
 		p := g.Unscaled(geometry.Point{X: x, Y: y})
@@ -22,10 +22,10 @@ func (g *DrawModeFill) Update() error {
 	return nil
 }
 
-func (g *DrawModeFill) Draw(screen *ebiten.Image) {
+func (g *DrawFillMode) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
 }
 
-func (g *DrawModeFill) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (g *DrawFillMode) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }

@@ -63,6 +63,6 @@ var drawModePencil DrawModePencil = DrawModePencil(normalMode)
 
 var drawModeRubber DrawModeRubber = DrawModeRubber(normalMode)
 
-var drawModeFill DrawModeFill = DrawModeFill(normalMode)
+var drawModeFill DrawFillMode = DrawFillMode(normalMode)
 
 var Game gameWrapper = gameWrapper{Wrapped: &normalMode}
