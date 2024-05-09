@@ -30,22 +30,16 @@ func New(minX, minY, maxX, maxY int) Morphology {
 	}
 }
 
-func (m Morphology) FillWith(p geometry.Point, foreground, background MorphType) bool {
-	if m.Data[p] != background {
-		return false
-	}
+func (m Morphology) FillWith(p geometry.Point, foreground, background MorphType) {
 	stack := []geometry.Point{p}
 	for len(stack) > 0 {
 		u := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
-		for _, v := range []geometry.Point{{X: u.X + 1, Y: u.Y}, {X: u.X, Y: u.Y + 1}, {X: u.X - 1, Y: u.Y}, {X: u.X, Y: u.Y - 1}} {
-			if v.X >= m.MinX && v.X < m.MaxX && v.Y >= m.MinY && v.Y < m.MaxY && m.Data[v] == background {
-				m.Data[v] = foreground
-				stack = append(stack, v)
-			}
+		if u.X >= m.MinX && u.X < m.MaxX && u.Y >= m.MinY && u.Y < m.MaxY && m.Data[u] == background {
+			m.Data[u] = foreground
+			stack = append(stack, geometry.Point{X: u.X + 1, Y: u.Y}, geometry.Point{X: u.X, Y: u.Y + 1}, geometry.Point{X: u.X - 1, Y: u.Y}, geometry.Point{X: u.X, Y: u.Y - 1})
 		}
 	}
-	return true
 }
 
 func (m Morphology) DrawLine(p1, p2 geometry.Point, t MorphType) {
