@@ -48,6 +48,15 @@ func (m Morphology) DrawLine(p1, p2 geometry.Point, t MorphType) {
 	}
 }
 
+func (m Morphology) DrawSquare(topleft geometry.Point, size int, t MorphType) {
+	r := geometry.Point{}
+	for r.X = topleft.X; r.X <= topleft.X+size; r.X++ {
+		for r.Y = topleft.Y; r.Y <= topleft.Y+size; r.Y++ {
+			m.Data[r] = t
+		}
+	}
+}
+
 func (m Morphology) Save(w io.Writer) error {
 	j, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {

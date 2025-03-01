@@ -17,12 +17,7 @@ func (g *DrawModeRubber) Update() error {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
 		p := g.Unscaled(geometry.Point{X: x, Y: y})
-		r := geometry.Point{}
-		for r.X = p.X; r.X <= p.X+g.RubberSize; r.X++ {
-			for r.Y = p.Y; r.Y <= p.Y+g.RubberSize; r.Y++ {
-				g.Morph.Data[r] = g.Fore
-			}
-		}
+		g.Morph.DrawSquare(p, g.RubberSize, g.Fore)
 	}
 	_, wheelDy := ebiten.Wheel()
 	g.RubberSize += int(wheelDy)

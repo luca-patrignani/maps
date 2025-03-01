@@ -86,3 +86,24 @@ func TestLoadSave(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestDrawSquare(t *testing.T) {
+	m := New(0, 0, 2000, 2000)
+	m.DrawSquare(geometry.Point{X: 3, Y: 4}, 5, Land)
+
+	expected := mapset.NewSet[geometry.Point]()
+	for x := 3; x <= 8; x++ {
+		for y := 4; y <= 9; y++ {
+			expected.Add(geometry.Point{X: x, Y: y})
+		}
+	}
+	actual := mapset.NewSet[geometry.Point]()
+	for p, t := range m.Data {
+		if t == Land {
+			actual.Add(p)
+		}
+	}
+	if !expected.Equal(actual) {
+		t.Fatal(expected, actual)
+	}
+}
