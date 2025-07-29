@@ -61,12 +61,6 @@ func (s State) Unscaled(p geometry.Point) geometry.Point {
 	return geometry.Point{X: p.X/s.ViewScale + s.ViewOrigin.X, Y: p.Y/s.ViewScale + s.ViewOrigin.Y}
 }
 
-var normalMode NormalMode
-
-var drawModePencil DrawModePencil
-
-var drawModeRubber DrawModeRubber
-
-var drawModeFill DrawFillMode
-
 var Game gameWrapper
+
+var normalMode NormalMode

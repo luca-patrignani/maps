@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/luca-patrignani/maps/geometry"
+	"github.com/luca-patrignani/maps/morphology"
 )
 
 type DrawModeRubber struct {
@@ -25,7 +26,10 @@ func (g *DrawModeRubber) Update() error {
 		g.RubberSize = 1
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-		Game.Wrapped = &drawModePencil
+		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
+			State: g.State,
+			geography: g.Morph,
+		}
 	}
 	return nil
 }

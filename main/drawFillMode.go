@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luca-patrignani/maps/geometry"
+	"github.com/luca-patrignani/maps/morphology"
 )
 
 type DrawFillMode struct {
@@ -17,7 +18,10 @@ func (g *DrawFillMode) Update() error {
 		g.Morph.FillWith(p, g.Fore, g.Back)
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-		Game.Wrapped = &drawModePencil
+		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
+			g.State,
+			g.Morph,
+		}
 	}
 	return nil
 }

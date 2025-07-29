@@ -42,9 +42,6 @@ func main() {
 		MorphFilename: "morphology.json",
 		FaceSource: faceSource,
 	}}
-	drawModePencil = DrawModePencil(normalMode)
-	drawModeRubber = DrawModeRubber(normalMode)
-	drawModeFill  = DrawFillMode(normalMode)
 	Game = gameWrapper{Wrapped: &normalMode}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	if err := ebiten.RunGame(&Game); err != nil {

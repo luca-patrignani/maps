@@ -6,11 +6,12 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 )
 
-type DrawModePencil struct {
+type DrawModePencil[T any] struct {
 	*State
+	geography geography[T]
 }
 
-func (g *DrawModePencil) Update() error {
+func (g *DrawModePencil[T]) Update() error {
 	x, y := ebiten.CursorPosition()
 	p := g.Unscaled(geometry.Point{X: x, Y: y})
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
@@ -22,7 +23,9 @@ func (g *DrawModePencil) Update() error {
 		g.PendingPoint = nil
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-		Game.Wrapped = &drawModeRubber
+		Game.Wrapped = &DrawModeRubber{
+			State: g.State,
+		}
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -32,19 +35,21 @@ func (g *DrawModePencil) Update() error {
 		g.State.Fore, g.State.Back = g.State.Back, g.State.Fore
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-		Game.Wrapped = &drawModeFill
+		Game.Wrapped = &DrawFillMode{
+			State: g.State,
+		}
 	}
 	return nil
 }
 
-func (g *DrawModePencil) Draw(screen *ebiten.Image) {
+func (g *DrawModePencil[T]) Draw(screen *ebiten.Image) {
 	normalMode.Draw(screen)
 }
 
-func (g *DrawModePencil) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (g *DrawModePencil[T]) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
 
-func (g *DrawModePencil) Name() string {
+func (g *DrawModePencil[T]) Name() string {
 	return "Draw pencil"
 }

@@ -55,7 +55,10 @@ func (g *NormalMode) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
-		Game.Wrapped = &drawModePencil
+		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
+			State: g.State,
+			geography: g.Morph,
+		}
 		fmt.Println("Entering draw mode")
 	}
 	return nil
