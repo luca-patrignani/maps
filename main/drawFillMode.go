@@ -29,3 +29,7 @@ func (g *DrawFillMode) Draw(screen *ebiten.Image) {
 func (g *DrawFillMode) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
+
+func (DrawFillMode) Name() string {
+	return "Draw fill"
+}

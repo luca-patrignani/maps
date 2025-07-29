@@ -41,3 +41,7 @@ func (g *DrawModeRubber) Draw(screen *ebiten.Image) {
 func (g *DrawModeRubber) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
+
+func (g *DrawModeRubber) Name() string {
+	return "Draw rubber"
+}

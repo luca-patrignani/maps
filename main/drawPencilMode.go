@@ -44,3 +44,7 @@ func (g *DrawModePencil) Draw(screen *ebiten.Image) {
 func (g *DrawModePencil) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
+
+func (g *DrawModePencil) Name() string {
+	return "Draw pencil"
+}

@@ -81,3 +81,8 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 func (g *NormalMode) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
+
+
+func (g *NormalMode) Name() string {
+	return "Normal"
+}
