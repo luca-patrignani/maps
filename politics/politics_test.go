@@ -13,11 +13,7 @@ const italy PoliticalEntity = 1
 
 func newMorphSquare() morphology.Morphology {
 	m := morphology.New(0, 0, 2000, 2000)
-	m.DrawLine(geometry.Point{X: 0, Y: 0}, geometry.Point{X: 5, Y: 0}, morphology.Land)
-	m.DrawLine(geometry.Point{X: 5, Y: 0}, geometry.Point{X: 5, Y: 5}, morphology.Land)
-	m.DrawLine(geometry.Point{X: 5, Y: 5}, geometry.Point{X: 0, Y: 5}, morphology.Land)
-	m.DrawLine(geometry.Point{X: 0, Y: 5}, geometry.Point{X: 0, Y: 0}, morphology.Land)
-	m.FillWith(geometry.Point{X: 1, Y: 1}, morphology.Land, morphology.Sea)
+	m.DrawSquare(geometry.Point{X: 0, Y: 0}, 5, morphology.Land)
 	return m
 }
 
