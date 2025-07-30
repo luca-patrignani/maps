@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
+	"github.com/luca-patrignani/maps/politics"
 )
 
 var mplusFaceSource, _ = text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
@@ -30,10 +31,14 @@ func (g *gameWrapper) Update() error {
 
 func (g *gameWrapper) Draw(screen *ebiten.Image) {
 	g.Wrapped.Draw(screen)
-	text.Draw(screen, fmt.Sprintf("%s mode", g.Wrapped.Name()), &text.GoTextFace{
-		Source: mplusFaceSource,
-		Size: 20,
-	}, nil)
+	text.Draw(
+		screen,
+		fmt.Sprintf("%s mode", g.Wrapped.Name()),
+		&text.GoTextFace{
+			Source: mplusFaceSource,
+			Size:   20,
+		},
+		nil)
 }
 
 func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -41,14 +46,17 @@ func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 type State struct {
-	Morph         *morphology.Morphology
-	MorphFilename string
-	PendingPoint  *geometry.Point
-	Fore, Back    morphology.MorphType
-	RubberSize    int
-	ViewScale     int
-	ViewOrigin    geometry.Point
-	FaceSource    *text.GoTextFaceSource
+	Morph                                    *morphology.Morphology
+	Politics                                 *politics.PoliticalMap
+	MorphFilename                            string
+	PendingPoint                             *geometry.Point
+	morphForeground, morphBackground         morphology.MorphType
+	politicalForeground, politicalBackground politics.PoliticalEntity
+	RubberSize                               int
+	ViewScale                                int
+	ViewOrigin                               geometry.Point
+	FaceSource                               *text.GoTextFaceSource
+	GeographyLabel                           string
 }
 
 // model -> view

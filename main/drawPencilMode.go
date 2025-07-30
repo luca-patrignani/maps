@@ -8,7 +8,9 @@ import (
 
 type DrawModePencil[T any] struct {
 	*State
-	geography geography[T]
+	geography              geography[T]
+	foreground, background *T
+	label                  string
 }
 
 func (g *DrawModePencil[T]) Update() error {
@@ -16,7 +18,7 @@ func (g *DrawModePencil[T]) Update() error {
 	p := g.Unscaled(geometry.Point{X: x, Y: y})
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		if g.PendingPoint != nil {
-			g.Morph.DrawLine(p, *g.PendingPoint, g.Fore)
+			g.geography.DrawLine(p, *g.PendingPoint, *g.foreground)
 		}
 		g.PendingPoint = &p
 	} else {
@@ -32,11 +34,15 @@ func (g *DrawModePencil[T]) Update() error {
 		Game.Wrapped = &normalMode
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		g.State.Fore, g.State.Back = g.State.Back, g.State.Fore
+		g.foreground, g.background = g.background, g.foreground
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-		Game.Wrapped = &DrawFillMode{
-			State: g.State,
+		Game.Wrapped = &DrawFillMode[T]{
+			State:      g.State,
+			geography:  g.geography,
+			foreground: g.foreground,
+			background: g.background,
+			label:      g.label,
 		}
 	}
 	return nil
@@ -51,5 +57,5 @@ func (g *DrawModePencil[T]) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *DrawModePencil[T]) Name() string {
-	return "Draw pencil"
+	return g.label + ": Draw pencil"
 }

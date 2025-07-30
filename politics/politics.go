@@ -14,8 +14,8 @@ type PoliticalEntity uint
 const None PoliticalEntity = 0
 
 type PoliticalMap struct {
-	Morphology morphology.Morphology
-	Data map[geometry.Point]PoliticalEntity
+	Morphology *morphology.Morphology
+	Data       map[geometry.Point]PoliticalEntity
 }
 
 func (pm PoliticalMap) FillWith(p geometry.Point, foreground, background PoliticalEntity) {
@@ -47,7 +47,7 @@ func (m PoliticalMap) Save(w io.Writer) error {
 	return err
 }
 
-func NewFromFile(r io.Reader, m morphology.Morphology) (PoliticalMap, error) {
+func NewFromFile(r io.Reader, m *morphology.Morphology) (PoliticalMap, error) {
 	j, err := io.ReadAll(r)
 	if err != nil {
 		return PoliticalMap{}, err

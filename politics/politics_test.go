@@ -11,10 +11,10 @@ import (
 
 const italy PoliticalEntity = 1
 
-func newMorphSquare() morphology.Morphology {
+func newMorphSquare() *morphology.Morphology {
 	m := morphology.New(0, 0, 2000, 2000)
 	m.DrawSquare(geometry.Point{X: 0, Y: 0}, 5, morphology.Land)
-	return m
+	return &m
 }
 
 func TestDrawLine(t *testing.T) {

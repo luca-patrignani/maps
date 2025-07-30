@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
+	"github.com/luca-patrignani/maps/politics"
 )
 
 type NormalMode struct {
@@ -56,10 +57,22 @@ func (g *NormalMode) Update() error {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
 		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
-			State: g.State,
-			geography: g.Morph,
+			State:      g.State,
+			geography:  g.Morph,
+			foreground: &g.morphForeground,
+			background: &g.morphBackground,
+			label:      "Morphology",
 		}
 		fmt.Println("Entering draw mode")
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		Game.Wrapped = &DrawModePencil[politics.PoliticalEntity]{
+			State:      g.State,
+			geography:  g.Politics,
+			foreground: &g.politicalForeground,
+			background: &g.politicalBackground,
+			label:      "Politics",
+		}
 	}
 	return nil
 }
@@ -79,12 +92,23 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+
+	for pp, t := range g.Politics.Data {
+		p := g.Scaled(pp)
+		if p.X < w && p.Y < h {
+			if t == 1 {
+				rect.Fill(color.RGBA{0, 0, 0, 255})
+				geoM := ebiten.GeoM{}
+				geoM.Translate(float64(p.X), float64(p.Y))
+				screen.DrawImage(rect, &ebiten.DrawImageOptions{GeoM: geoM})
+			}
+		}
+	}
 }
 
 func (g *NormalMode) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
-
 
 func (g *NormalMode) Name() string {
 	return "Normal"

@@ -10,6 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
+	"github.com/luca-patrignani/maps/politics"
 )
 
 var (
@@ -25,22 +26,29 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	morph := &morphology.Morphology{
+		Data: map[geometry.Point]morphology.MorphType{},
+		MinX: 0,
+		MinY: 0,
+		MaxX: 2000,
+		MaxY: 2000,
+	}
 	normalMode = NormalMode{State: &State{
-		Morph: &morphology.Morphology{
-			Data: map[geometry.Point]morphology.MorphType{},
-			MinX: 0,
-			MinY: 0,
-			MaxX: 2000,
-			MaxY: 2000,
+		Morph: morph,
+		Politics: &politics.PoliticalMap{
+			Data:       make(map[geometry.Point]politics.PoliticalEntity),
+			Morphology: morph,
 		},
-		PendingPoint:  &geometry.Point{},
-		Fore:          morphology.Land,
-		Back:          morphology.Sea,
-		RubberSize:    40,
-		ViewScale:     15,
-		ViewOrigin:    geometry.Point{X: 0, Y: 0},
-		MorphFilename: "morphology.json",
-		FaceSource: faceSource,
+		PendingPoint:        &geometry.Point{},
+		morphForeground:     morphology.Land,
+		morphBackground:     morphology.Sea,
+		politicalForeground: 1,
+		politicalBackground: politics.None,
+		RubberSize:          40,
+		ViewScale:           15,
+		ViewOrigin:          geometry.Point{X: 0, Y: 0},
+		MorphFilename:       "morphology.json",
+		FaceSource:          faceSource,
 	}}
 	Game = gameWrapper{Wrapped: &normalMode}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

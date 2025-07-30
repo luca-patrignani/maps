@@ -18,7 +18,7 @@ func (g *DrawModeRubber) Update() error {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
 		p := g.Unscaled(geometry.Point{X: x, Y: y})
-		g.Morph.DrawSquare(p, g.RubberSize, g.Fore)
+		g.Morph.DrawSquare(p, g.RubberSize, g.morphForeground)
 	}
 	_, wheelDy := ebiten.Wheel()
 	g.RubberSize += int(wheelDy)
@@ -27,8 +27,9 @@ func (g *DrawModeRubber) Update() error {
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
-			State: g.State,
+			State:     g.State,
 			geography: g.Morph,
+			label:     "morphology",
 		}
 	}
 	return nil
