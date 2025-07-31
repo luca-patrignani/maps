@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luca-patrignani/maps/geometry"
@@ -23,6 +25,11 @@ func (g *DrawModePencil[T]) Update() error {
 		g.pendingPoint = &p
 	} else {
 		g.pendingPoint = nil
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButton2) {
+		t, _ := g.geography.At(p)
+		g.foreground = &t
+		fmt.Println("You picked ", t)
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		Game.Wrapped = &DrawModeRubber{

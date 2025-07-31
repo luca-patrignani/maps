@@ -62,3 +62,8 @@ func (p *PoliticalMap) Load(r io.Reader) error {
 	err = json.Unmarshal(j, &p.Data)
 	return err
 }
+
+func (m PoliticalMap) At(p geometry.Point) (PoliticalEntity, bool) {
+	v, ok := m.Data[p]
+	return v, ok
+}

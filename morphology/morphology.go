@@ -74,3 +74,8 @@ func (m *Morphology) Load(r io.Reader) error {
 	err = json.Unmarshal(j, &m)
 	return err
 }
+
+func (m Morphology) At(p geometry.Point) (MorphType, bool) {
+	v, ok := m.Data[p]
+	return v, ok
+}
