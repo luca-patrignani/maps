@@ -99,12 +99,12 @@ func (g *NormalMode) Update() error {
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyN) {
-		name, c, err := stdio.NewPoliticalEntity()
+		entity, err := stdio.NewPoliticalEntity()
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			g.politicalForeground = name
-			g.regionToColor[name] = c
+			g.politicalForeground = entity
+			g.PoliticalEntities = append(g.PoliticalEntities, entity)
 		}
 	}
 	return nil
@@ -126,15 +126,11 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	for pp, t := range g.Politics.Data {
+	for pp, entity := range g.Politics.Data {
 		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
-			if t != politics.None {
-				c, ok := g.regionToColor[t]
-				if !ok {
-					c = color.RGBA{0, 0, 0, 255}
-				}
-				rect.Fill(c)
+			if entity != politics.None {
+				rect.Fill(entity.Color)
 				geoM := ebiten.GeoM{}
 				geoM.Translate(float64(p.X), float64(p.Y))
 				screen.DrawImage(rect, &ebiten.DrawImageOptions{GeoM: geoM})

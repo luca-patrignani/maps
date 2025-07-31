@@ -2,14 +2,14 @@ package politics
 
 import (
 	"bytes"
+	"image/color"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
 )
-
-const italy PoliticalEntity = "Italy"
+var italy PoliticalEntity = PoliticalEntity{"italy", color.RGBA{100, 100, 100, 255}}
 
 func newMorphSquare() *morphology.Morphology {
 	m := morphology.New(0, 0, 2000, 2000)

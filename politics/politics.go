@@ -2,6 +2,7 @@ package politics
 
 import (
 	"encoding/json"
+	"image/color"
 	"io"
 
 	"github.com/luca-patrignani/maps/bresenham"
@@ -9,9 +10,15 @@ import (
 	"github.com/luca-patrignani/maps/morphology"
 )
 
-type PoliticalEntity string
+type PoliticalEntity struct {
+	Name string
+	Color color.RGBA
+}
 
-const None PoliticalEntity = ""
+var None = PoliticalEntity{
+	Name: "",
+	Color: color.RGBA{0, 0, 0, 0},
+}
 
 type PoliticalMap struct {
 	Morphology *morphology.Morphology

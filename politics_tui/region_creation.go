@@ -2,7 +2,6 @@ package politics_tui
 
 import (
 	"fmt"
-	"image/color"
 	"io"
 
 	"github.com/luca-patrignani/maps/politics"
@@ -13,7 +12,7 @@ type IO struct {
 	Out io.Writer
 }
 
-func (io IO) NewPoliticalEntity() (name politics.PoliticalEntity, c color.RGBA, err error) {
+func (io IO) NewPoliticalEntity() (entity politics.PoliticalEntity, err error) {
 	_, err = fmt.Fprintln(io.Out, "This prompt lets you create a new political entity")
 	if err != nil {
 		return
@@ -22,7 +21,7 @@ func (io IO) NewPoliticalEntity() (name politics.PoliticalEntity, c color.RGBA, 
 	if err != nil {
 		return
 	}
-	_, err = fmt.Fscanln(io.In, &name)
+	_, err = fmt.Fscanln(io.In, &entity.Name)
 	if err != nil {
 		return
 	}
@@ -34,6 +33,7 @@ func (io IO) NewPoliticalEntity() (name politics.PoliticalEntity, c color.RGBA, 
 	if err != nil {
 		return
 	}
+	c := &entity.Color
 	_, err = fmt.Fscanln(io.In, &c.R, &c.G, &c.B)
 	c.A = 255
 	return

@@ -48,7 +48,7 @@ func main() {
 		ViewScale:           15,
 		ViewOrigin:          geometry.Point{X: 0, Y: 0},
 		FaceSource:          faceSource,
-		regionToColor:       map[politics.PoliticalEntity]color.RGBA{},
+		PoliticalEntities:   []politics.PoliticalEntity{},
 	}}
 	Game = gameWrapper{Wrapped: &normalMode}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

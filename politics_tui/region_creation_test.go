@@ -10,22 +10,22 @@ import (
 func TestCreation(t *testing.T) {
 	r := strings.NewReader("Italy\n100 100 100")
 	io := IO{In: r, Out: io.Discard}
-	name, c, err := io.NewPoliticalEntity()
+	entity, err := io.NewPoliticalEntity()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if name != "Italy" {
+	if entity.Name != "Italy" {
 		t.Fatal()
 	}
-	if c != (color.RGBA{100, 100, 100, 255}) {
-		t.Fatal(c)
+	if entity.Color != (color.RGBA{100, 100, 100, 255}) {
+		t.Fatal(entity.Color)
 	}
 }
 
 func TestEmptyName(t *testing.T) {
 	r := strings.NewReader("\n100 100 100")
 	io := IO{In: r, Out: io.Discard}
-	_, _, err := io.NewPoliticalEntity()
+	_, err := io.NewPoliticalEntity()
 	if err == nil {
 		t.Fatal()
 	}
@@ -34,7 +34,7 @@ func TestEmptyName(t *testing.T) {
 func TestInvalidColor(t *testing.T) {
 	r := strings.NewReader("\n100 100")
 	io := IO{In: r, Out: io.Discard}
-	_, _, err := io.NewPoliticalEntity()
+	_, err := io.NewPoliticalEntity()
 	if err == nil {
 		t.Fatal()
 	}
