@@ -46,29 +46,26 @@ func (g *gameWrapper) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 type State struct {
-	Morph                                    *morphology.Morphology
-	Politics                                 *politics.PoliticalMap
-	MorphFilename                            string
-	PoliticsFilename                         string
-	PendingPoint                             *geometry.Point
+	morph                                    *morphology.Morphology
+	politics                                 *politics.PoliticalMap
+	pendingPoint                             *geometry.Point
 	morphForeground, morphBackground         morphology.MorphType
 	politicalForeground, politicalBackground politics.PoliticalEntity
-	RubberSize                               int
-	ViewScale                                int
-	ViewOrigin                               geometry.Point
-	FaceSource                               *text.GoTextFaceSource
-	GeographyLabel                           string
-	PoliticalEntities                        []politics.PoliticalEntity
+	rubberSize                               int
+	viewScale                                int
+	viewOrigin                               geometry.Point
+	faceSource                               *text.GoTextFaceSource
+	politicalEntities                        []politics.PoliticalEntity
 }
 
 // model -> view
 func (s State) Scaled(p geometry.Point) geometry.Point {
-	return geometry.Point{X: (p.X - s.ViewOrigin.X) * s.ViewScale, Y: (p.Y - s.ViewOrigin.Y) * s.ViewScale}
+	return geometry.Point{X: (p.X - s.viewOrigin.X) * s.viewScale, Y: (p.Y - s.viewOrigin.Y) * s.viewScale}
 }
 
 // view -> model
 func (s State) Unscaled(p geometry.Point) geometry.Point {
-	return geometry.Point{X: p.X/s.ViewScale + s.ViewOrigin.X, Y: p.Y/s.ViewScale + s.ViewOrigin.Y}
+	return geometry.Point{X: p.X/s.viewScale + s.viewOrigin.X, Y: p.Y/s.viewScale + s.viewOrigin.Y}
 }
 
 var Game gameWrapper

@@ -34,21 +34,21 @@ func main() {
 		MaxY: 2000,
 	}
 	normalMode = NormalMode{State: &State{
-		Morph: morph,
-		Politics: &politics.PoliticalMap{
+		morph: morph,
+		politics: &politics.PoliticalMap{
 			Data:       make(map[geometry.Point]politics.PoliticalEntity),
 			Morphology: morph,
 		},
-		PendingPoint:        &geometry.Point{},
+		pendingPoint:        &geometry.Point{},
 		morphForeground:     morphology.Land,
 		morphBackground:     morphology.Sea,
 		politicalForeground: politics.None,
 		politicalBackground: politics.None,
-		RubberSize:          40,
-		ViewScale:           15,
-		ViewOrigin:          geometry.Point{X: 0, Y: 0},
-		FaceSource:          faceSource,
-		PoliticalEntities:   []politics.PoliticalEntity{},
+		rubberSize:          40,
+		viewScale:           15,
+		viewOrigin:          geometry.Point{X: 0, Y: 0},
+		faceSource:          faceSource,
+		politicalEntities:   []politics.PoliticalEntity{},
 	}}
 	Game = gameWrapper{Wrapped: &normalMode}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

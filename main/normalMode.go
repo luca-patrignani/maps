@@ -32,18 +32,18 @@ type saver interface {
 
 func (g *NormalMode) Update() error {
 	_, wheelDy := ebiten.Wheel()
-	g.ViewScale += int(wheelDy)
-	if g.ViewScale < 1 {
-		g.ViewScale = 1
+	g.viewScale += int(wheelDy)
+	if g.viewScale < 1 {
+		g.viewScale = 1
 	}
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0) {
 		x, y := ebiten.CursorPosition()
 		w, h := g.Layout(ebiten.WindowSize())
-		g.ViewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
+		g.viewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
 	}
 	var saverAndFilenames = map[saver]string{
-		g.Morph:    basePath + "morphology.json",
-		g.Politics: basePath + "politics.json",
+		g.morph:    basePath + "morphology.json",
+		g.politics: basePath + "politics.json",
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		if err := os.Mkdir(basePath, os.ModePerm); err != nil && !os.IsExist(err) {
@@ -82,7 +82,7 @@ func (g *NormalMode) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
 		Game.Wrapped = &DrawModePencil[morphology.MorphType]{
 			State:      g.State,
-			geography:  g.Morph,
+			geography:  g.morph,
 			foreground: &g.morphForeground,
 			background: &g.morphBackground,
 			label:      "Morphology",
@@ -92,7 +92,7 @@ func (g *NormalMode) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		Game.Wrapped = &DrawModePencil[politics.PoliticalEntity]{
 			State:      g.State,
-			geography:  g.Politics,
+			geography:  g.politics,
 			foreground: &g.politicalForeground,
 			background: &g.politicalBackground,
 			label:      "Politics",
@@ -104,7 +104,7 @@ func (g *NormalMode) Update() error {
 			fmt.Println(err)
 		} else {
 			g.politicalForeground = entity
-			g.PoliticalEntities = append(g.PoliticalEntities, entity)
+			g.politicalEntities = append(g.politicalEntities, entity)
 		}
 	}
 	return nil
@@ -113,8 +113,8 @@ func (g *NormalMode) Update() error {
 func (g *NormalMode) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 255, 255})
 	w, h := ebiten.WindowSize()
-	rect := ebiten.NewImage(g.ViewScale, g.ViewScale)
-	for pp, t := range g.Morph.Data {
+	rect := ebiten.NewImage(g.viewScale, g.viewScale)
+	for pp, t := range g.morph.Data {
 		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
 			if t == morphology.Land {
@@ -126,7 +126,7 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	for pp, entity := range g.Politics.Data {
+	for pp, entity := range g.politics.Data {
 		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
 			if entity != politics.None {

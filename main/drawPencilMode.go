@@ -17,12 +17,12 @@ func (g *DrawModePencil[T]) Update() error {
 	x, y := ebiten.CursorPosition()
 	p := g.Unscaled(geometry.Point{X: x, Y: y})
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
-		if g.PendingPoint != nil {
-			g.geography.DrawLine(p, *g.PendingPoint, *g.foreground)
+		if g.pendingPoint != nil {
+			g.geography.DrawLine(p, *g.pendingPoint, *g.foreground)
 		}
-		g.PendingPoint = &p
+		g.pendingPoint = &p
 	} else {
-		g.PendingPoint = nil
+		g.pendingPoint = nil
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		Game.Wrapped = &DrawModeRubber{
