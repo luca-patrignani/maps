@@ -18,7 +18,7 @@ type NormalMode struct {
 }
 
 var stdio politics_tui.IO = politics_tui.IO{
-	In: os.Stdin,
+	In:  os.Stdin,
 	Out: os.Stdout,
 }
 
@@ -112,7 +112,7 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
 			if t != politics.None {
-				c, ok := g.State.regionToColor[t]
+				c, ok := g.regionToColor[t]
 				if !ok {
 					c = color.RGBA{0, 0, 0, 255}
 				}

@@ -26,8 +26,14 @@ func (io IO) NewPoliticalEntity() (name politics.PoliticalEntity, c color.RGBA, 
 	if err != nil {
 		return
 	}
-	fmt.Fprintln(io.Out, "Color to be used to show the new political entity")
-	fmt.Fprintln(io.Out, "The color must be expressed as RBG, with a whitespace between each field")
+	_, err = fmt.Fprintln(io.Out, "Color to be used to show the new political entity")
+	if err != nil {
+		return
+	}
+	_, err = fmt.Fprintln(io.Out, "The color must be expressed as RBG, with a whitespace between each field")
+	if err != nil {
+		return
+	}
 	_, err = fmt.Fscanln(io.In, &c.R, &c.G, &c.B)
 	c.A = 255
 	return

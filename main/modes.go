@@ -58,7 +58,7 @@ type State struct {
 	ViewOrigin                               geometry.Point
 	FaceSource                               *text.GoTextFaceSource
 	GeographyLabel                           string
-	regionToColor map[politics.PoliticalEntity]color.RGBA
+	regionToColor                            map[politics.PoliticalEntity]color.RGBA
 }
 
 // model -> view
