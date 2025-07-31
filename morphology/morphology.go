@@ -66,12 +66,11 @@ func (m Morphology) Save(w io.Writer) error {
 	return err
 }
 
-func NewFromFile(r io.Reader) (Morphology, error) {
+func (m *Morphology) Load(r io.Reader) error {
 	j, err := io.ReadAll(r)
 	if err != nil {
-		return Morphology{}, err
+		return err
 	}
-	m := Morphology{}
 	err = json.Unmarshal(j, &m)
-	return m, err
+	return err
 }

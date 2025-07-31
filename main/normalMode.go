@@ -27,6 +27,7 @@ var basePath = ".saves/"
 
 type saver interface {
 	Save(w io.Writer) error
+	Load(r io.Reader) error
 }
 
 func (g *NormalMode) Update() error {
@@ -40,13 +41,13 @@ func (g *NormalMode) Update() error {
 		w, h := g.Layout(ebiten.WindowSize())
 		g.ViewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
 	}
+	var saverAndFilenames = map[saver]string{
+		g.Morph:    basePath + "morphology.json",
+		g.Politics: basePath + "politics.json",
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		if err := os.Mkdir(basePath, os.ModePerm); err != nil && !os.IsExist(err) {
 			return err
-		}
-		var saverAndFilenames = map[saver]string{
-			g.Morph:    basePath + "morphology.json",
-			g.Politics: basePath + "politics.json",
 		}
 		for saver, filename := range saverAndFilenames {
 			f, err := os.Create(filename)
@@ -62,17 +63,19 @@ func (g *NormalMode) Update() error {
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyL) {
-		f, err := os.Open(g.MorphFilename)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		*g.Morph, err = morphology.NewFromFile(f)
-		if err != nil {
-			return err
-		}
-		if err := f.Close(); err != nil {
-			return err
+		for saver, filename := range saverAndFilenames {
+			f, err := os.Open(filename)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			err = saver.Load(f)
+			if err != nil {
+				return err
+			}
+			if err := f.Close(); err != nil {
+				return err
+			}
 		}
 	}
 

@@ -47,12 +47,11 @@ func (m PoliticalMap) Save(w io.Writer) error {
 	return err
 }
 
-func NewFromFile(r io.Reader, m *morphology.Morphology) (PoliticalMap, error) {
+func (p *PoliticalMap) Load(r io.Reader) error {
 	j, err := io.ReadAll(r)
 	if err != nil {
-		return PoliticalMap{}, err
+		return err
 	}
-	pm := PoliticalMap{Morphology: m}
-	err = json.Unmarshal(j, &pm.Data)
-	return pm, err
+	err = json.Unmarshal(j, &p.Data)
+	return err
 }

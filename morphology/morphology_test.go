@@ -78,7 +78,8 @@ func TestLoadSave(t *testing.T) {
 	if err := m1.Save(&rw); err != nil {
 		t.Fatal(err)
 	}
-	m2, err := NewFromFile(&rw)
+	m2 := Morphology{}
+	err := m2.Load(&rw)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -76,7 +76,8 @@ func TestLoadSave(t *testing.T) {
 	if err := pm.Save(&b); err != nil {
 		t.Fatal(err)
 	}
-	pm2, err := NewFromFile(&b, pm.Morphology)
+	pm2 := &PoliticalMap{Morphology: pm.Morphology}
+	err := pm2.Load(&b)
 	if err != nil {
 		t.Fatal(err)
 	}
