@@ -47,7 +47,6 @@ func main() {
 		RubberSize:          40,
 		ViewScale:           15,
 		ViewOrigin:          geometry.Point{X: 0, Y: 0},
-		MorphFilename:       "morphology.json",
 		FaceSource:          faceSource,
 		regionToColor:       map[politics.PoliticalEntity]color.RGBA{},
 	}}

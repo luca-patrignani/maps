@@ -50,6 +50,7 @@ type State struct {
 	Morph                                    *morphology.Morphology
 	Politics                                 *politics.PoliticalMap
 	MorphFilename                            string
+	PoliticsFilename                         string
 	PendingPoint                             *geometry.Point
 	morphForeground, morphBackground         morphology.MorphType
 	politicalForeground, politicalBackground politics.PoliticalEntity

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"io"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -22,6 +23,12 @@ var stdio politics_tui.IO = politics_tui.IO{
 	Out: os.Stdout,
 }
 
+var basePath = ".saves/"
+
+type saver interface {
+	Save(w io.Writer) error
+}
+
 func (g *NormalMode) Update() error {
 	_, wheelDy := ebiten.Wheel()
 	g.ViewScale += int(wheelDy)
@@ -34,16 +41,24 @@ func (g *NormalMode) Update() error {
 		g.ViewOrigin = g.Unscaled(geometry.Point{X: x - w/2, Y: y - h/2})
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		f, err := os.Create(g.MorphFilename)
-		if err != nil {
-			fmt.Println(err)
+		if err := os.Mkdir(basePath, os.ModePerm); err != nil && !os.IsExist(err) {
 			return err
 		}
-		if err := g.Morph.Save(f); err != nil {
-			return err
+		var saverAndFilenames = map[saver]string{
+			g.Morph:    basePath + "morphology.json",
+			g.Politics: basePath + "politics.json",
 		}
-		if err := f.Close(); err != nil {
-			return err
+		for saver, filename := range saverAndFilenames {
+			f, err := os.Create(filename)
+			if err != nil {
+				return err
+			}
+			if err := saver.Save(f); err != nil {
+				return err
+			}
+			if err := f.Close(); err != nil {
+				return err
+			}
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyL) {
