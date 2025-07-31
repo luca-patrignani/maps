@@ -105,7 +105,6 @@ func (g *NormalMode) Update() error {
 			fmt.Println(err)
 		} else {
 			g.politicalForeground = entity
-			g.politicalEntities = append(g.politicalEntities, entity)
 		}
 	}
 	return nil

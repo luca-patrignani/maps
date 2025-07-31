@@ -55,7 +55,6 @@ type State struct {
 	viewScale                                int
 	viewOrigin                               geometry.Point
 	faceSource                               *text.GoTextFaceSource
-	politicalEntities                        []politics.PoliticalEntity
 }
 
 // model -> view
