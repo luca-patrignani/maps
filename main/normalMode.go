@@ -8,6 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
 	"github.com/luca-patrignani/maps/politics"
@@ -136,6 +137,22 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 				screen.DrawImage(rect, &ebiten.DrawImageOptions{GeoM: geoM})
 			}
 		}
+	}
+
+	x, y := ebiten.CursorPosition()
+	cursor := g.Unscaled(geometry.Point{X: x, Y: y})
+	if entity, ok := g.politics.Data[cursor]; ok {
+		geoM := ebiten.GeoM{}
+		geoM.Translate(float64(x), float64(y+20))
+		text.Draw(
+			screen,
+			entity.Name,
+			&text.GoTextFace{
+				Source: mplusFaceSource,
+				Size:   15,
+			},
+			&text.DrawOptions{DrawImageOptions: ebiten.DrawImageOptions{GeoM: geoM}},
+		)
 	}
 }
 
