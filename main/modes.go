@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -57,6 +58,7 @@ type State struct {
 	ViewOrigin                               geometry.Point
 	FaceSource                               *text.GoTextFaceSource
 	GeographyLabel                           string
+	regionToColor map[politics.PoliticalEntity]color.RGBA
 }
 
 // model -> view

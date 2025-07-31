@@ -9,9 +9,9 @@ import (
 	"github.com/luca-patrignani/maps/morphology"
 )
 
-type PoliticalEntity uint
+type PoliticalEntity string
 
-const None PoliticalEntity = 0
+const None PoliticalEntity = ""
 
 type PoliticalMap struct {
 	Morphology *morphology.Morphology

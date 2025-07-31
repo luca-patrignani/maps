@@ -42,13 +42,14 @@ func main() {
 		PendingPoint:        &geometry.Point{},
 		morphForeground:     morphology.Land,
 		morphBackground:     morphology.Sea,
-		politicalForeground: 1,
+		politicalForeground: politics.None,
 		politicalBackground: politics.None,
 		RubberSize:          40,
 		ViewScale:           15,
 		ViewOrigin:          geometry.Point{X: 0, Y: 0},
 		MorphFilename:       "morphology.json",
 		FaceSource:          faceSource,
+		regionToColor: map[politics.PoliticalEntity]color.RGBA{},
 	}}
 	Game = gameWrapper{Wrapped: &normalMode}
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

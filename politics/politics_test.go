@@ -9,7 +9,7 @@ import (
 	"github.com/luca-patrignani/maps/morphology"
 )
 
-const italy PoliticalEntity = 1
+const italy PoliticalEntity = "Italy"
 
 func newMorphSquare() *morphology.Morphology {
 	m := morphology.New(0, 0, 2000, 2000)

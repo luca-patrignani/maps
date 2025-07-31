@@ -10,10 +10,16 @@ import (
 	"github.com/luca-patrignani/maps/geometry"
 	"github.com/luca-patrignani/maps/morphology"
 	"github.com/luca-patrignani/maps/politics"
+	"github.com/luca-patrignani/maps/politics_tui"
 )
 
 type NormalMode struct {
 	*State
+}
+
+var stdio politics_tui.IO = politics_tui.IO{
+	In: os.Stdin,
+	Out: os.Stdout,
 }
 
 func (g *NormalMode) Update() error {
@@ -74,6 +80,15 @@ func (g *NormalMode) Update() error {
 			label:      "Politics",
 		}
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyN) {
+		name, c, err := stdio.NewPoliticalEntity()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			g.politicalForeground = name
+			g.regionToColor[name] = c
+		}
+	}
 	return nil
 }
 
@@ -96,8 +111,12 @@ func (g *NormalMode) Draw(screen *ebiten.Image) {
 	for pp, t := range g.Politics.Data {
 		p := g.Scaled(pp)
 		if p.X < w && p.Y < h {
-			if t == 1 {
-				rect.Fill(color.RGBA{0, 0, 0, 255})
+			if t != politics.None {
+				c, ok := g.State.regionToColor[t]
+				if !ok {
+					c = color.RGBA{0, 0, 0, 255}
+				}
+				rect.Fill(c)
 				geoM := ebiten.GeoM{}
 				geoM.Translate(float64(p.X), float64(p.Y))
 				screen.DrawImage(rect, &ebiten.DrawImageOptions{GeoM: geoM})
